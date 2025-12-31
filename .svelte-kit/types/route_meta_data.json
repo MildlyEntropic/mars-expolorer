@@ -1,0 +1,9 @@
+{
+	"/": [],
+	"/api/mer-image": [
+		"src/routes/api/mer-image/+server.ts"
+	],
+	"/api/mer": [
+		"src/routes/api/mer/+server.ts"
+	]
+}

@@ -1,71 +1,92 @@
 <script lang="ts">
-	// Carbon Ads placeholder component
-	// To activate: Replace this with actual Carbon Ads script
-	// Sign up at https://www.carbonads.net/
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+
+	// Google AdSense component
+	// To activate:
+	// 1. Sign up at https://www.google.com/adsense/
+	// 2. Replace YOUR_PUB_ID with your ca-pub-XXXXXXX ID
+	// 3. Replace YOUR_AD_SLOT with your ad unit slot ID
 
 	interface Props {
 		location?: 'footer' | 'sidebar';
 	}
 
 	let { location = 'footer' }: Props = $props();
+
+	// Google AdSense IDs
+	const AD_CLIENT = 'ca-pub-1831808995712219'; // Your publisher ID
+	const AD_SLOT = 'XXXXXXXXXX'; // Your ad slot ID
+
+	let adLoaded = $state(false);
+
+	onMount(() => {
+		// Only load ads in production and if IDs are configured
+		if (browser && AD_CLIENT !== 'ca-pub-XXXXXXXXXXXXXXXX') {
+			try {
+				((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+				adLoaded = true;
+			} catch (e) {
+				console.error('AdSense error:', e);
+			}
+		}
+	});
 </script>
+
+<svelte:head>
+	{#if browser && AD_CLIENT !== 'ca-pub-XXXXXXXXXXXXXXXX'}
+		<script
+			async
+			src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={AD_CLIENT}"
+			crossorigin="anonymous"
+		></script>
+	{/if}
+</svelte:head>
 
 {#if location === 'footer'}
 	<!-- Footer ad: horizontal banner -->
-	<div class="carbon-ads-placeholder flex items-center justify-center py-4">
-		<!--
-			To integrate Carbon Ads:
-			1. Sign up at https://www.carbonads.net/
-			2. Get your script tag
-			3. Replace this div with:
-			<script
-				async
-				type="text/javascript"
-				src="//cdn.carbonads.com/carbon.js?serve=YOUR_CODE&placement=YOUR_SITE"
-				id="_carbonads_js">
-			</script>
-		-->
-		<div class="text-gray-600 text-xs">
-			<!-- Placeholder - remove when ad is live -->
-		</div>
+	<div class="adsense-container flex items-center justify-center py-4">
+		{#if AD_CLIENT !== 'ca-pub-XXXXXXXXXXXXXXXX'}
+			<ins
+				class="adsbygoogle"
+				style="display:block"
+				data-ad-client={AD_CLIENT}
+				data-ad-slot={AD_SLOT}
+				data-ad-format="horizontal"
+				data-full-width-responsive="true"
+			></ins>
+		{:else}
+			<div class="text-gray-500 text-xs">
+				<!-- Ad placeholder - configure AdSense IDs to activate -->
+			</div>
+		{/if}
 	</div>
 {:else}
 	<!-- Sidebar ad: vertical/square -->
-	<div class="carbon-ads-placeholder hidden lg:block">
-		<!-- Same Carbon integration as above -->
-		<div class="text-gray-600 text-xs">
-			<!-- Placeholder - remove when ad is live -->
-		</div>
+	<div class="adsense-container hidden lg:block">
+		{#if AD_CLIENT !== 'ca-pub-XXXXXXXXXXXXXXXX'}
+			<ins
+				class="adsbygoogle"
+				style="display:block"
+				data-ad-client={AD_CLIENT}
+				data-ad-slot={AD_SLOT}
+				data-ad-format="auto"
+				data-full-width-responsive="true"
+			></ins>
+		{:else}
+			<div class="text-gray-500 text-xs">
+				<!-- Ad placeholder - configure AdSense IDs to activate -->
+			</div>
+		{/if}
 	</div>
 {/if}
 
 <style>
-	/* Carbon Ads default styling override to match dark theme */
-	:global(#carbonads) {
-		font-family: inherit;
-		max-width: 330px;
-		border-radius: 8px;
-		background: rgb(31 41 55 / 0.5);
-		border: 1px solid rgb(55 65 81);
-		padding: 1rem;
+	.adsense-container {
+		min-height: 90px;
 	}
 
-	:global(#carbonads a) {
-		color: rgb(249 115 22);
-		text-decoration: none;
-	}
-
-	:global(#carbonads a:hover) {
-		color: rgb(251 146 60);
-	}
-
-	:global(.carbon-text) {
-		color: rgb(156 163 175);
-		font-size: 0.875rem;
-	}
-
-	:global(.carbon-poweredby) {
-		color: rgb(107 114 128);
-		font-size: 0.75rem;
+	:global(.adsbygoogle) {
+		background: transparent;
 	}
 </style>
