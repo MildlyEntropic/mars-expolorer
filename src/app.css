@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+:root {
+	--color-mars-orange: #c1440e;
+	--color-mars-rust: #8b2500;
+	--color-space-black: #0a0a0f;
+	--color-space-dark: #12121a;
+}
+
+html {
+	background-color: var(--color-space-black);
+	color: #e5e5e5;
+}
+
+body {
+	min-height: 100vh;
+	font-family: system-ui, -apple-system, sans-serif;
+}
