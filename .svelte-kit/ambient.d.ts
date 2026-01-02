@@ -26,7 +26,6 @@
  * ```
  */
 declare module '$env/static/private' {
-	export const GJS_DEBUG_TOPICS: string;
 	export const LESSOPEN: string;
 	export const VSCODE_CWD: string;
 	export const VSCODE_ESM_ENTRYPOINT: string;
@@ -53,18 +52,16 @@ declare module '$env/static/private' {
 	export const PYENV_SHELL: string;
 	export const NVM_INC: string;
 	export const VSCODE_IPC_HOOK: string;
-	export const GIO_LAUNCHED_DESKTOP_FILE: string;
 	export const APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL: string;
 	export const ROS_PYTHON_VERSION: string;
 	export const GTK_MODULES: string;
-	export const MANAGERPID: string;
 	export const npm_config_userconfig: string;
 	export const npm_config_local_prefix: string;
 	export const SYSTEMD_EXEC_PID: string;
 	export const GSM_SKIP_SSH_AGENT_WORKAROUND: string;
 	export const DBUS_SESSION_BUS_ADDRESS: string;
+	export const COLORTERM: string;
 	export const _CONDA_ROOT: string;
-	export const GIO_LAUNCHED_DESKTOP_FILE_PID: string;
 	export const COLOR: string;
 	export const NVM_DIR: string;
 	export const VSCODE_CRASH_REPORTER_PROCESS_TYPE: string;
@@ -72,7 +69,6 @@ declare module '$env/static/private' {
 	export const ROS_DISTRO: string;
 	export const GTK_IM_MODULE: string;
 	export const LOGNAME: string;
-	export const JOURNAL_STREAM: string;
 	export const _: string;
 	export const npm_config_prefix: string;
 	export const npm_config_npm_version: string;
@@ -88,11 +84,11 @@ declare module '$env/static/private' {
 	export const npm_config_node_gyp: string;
 	export const PATH: string;
 	export const SESSION_MANAGER: string;
-	export const INVOCATION_ID: string;
 	export const NODE: string;
 	export const npm_package_name: string;
 	export const COREPACK_ENABLE_AUTO_PIN: string;
 	export const XDG_MENU_PREFIX: string;
+	export const GNOME_TERMINAL_SCREEN: string;
 	export const XDG_RUNTIME_DIR: string;
 	export const GDK_BACKEND: string;
 	export const DISPLAY: string;
@@ -103,6 +99,7 @@ declare module '$env/static/private' {
 	export const XDG_SESSION_DESKTOP: string;
 	export const XAUTHORITY: string;
 	export const LS_COLORS: string;
+	export const GNOME_TERMINAL_SERVICE: string;
 	export const npm_lifecycle_script: string;
 	export const SSH_AUTH_SOCK: string;
 	export const ROS_DOMAIN_ID: string;
@@ -117,7 +114,6 @@ declare module '$env/static/private' {
 	export const CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING: string;
 	export const LESSCLOSE: string;
 	export const CLAUDECODE: string;
-	export const GJS_DEBUG_OUTPUT: string;
 	export const _CONDA_EXE: string;
 	export const GZ_VERSION: string;
 	export const ROS_AUTOMATIC_DISCOVERY_RANGE: string;
@@ -125,6 +121,7 @@ declare module '$env/static/private' {
 	export const npm_config_globalconfig: string;
 	export const npm_config_init_module: string;
 	export const PWD: string;
+	export const VSCODE_CLI: string;
 	export const npm_execpath: string;
 	export const CONDA_EXE: string;
 	export const VSCODE_CODE_CACHE_PATH: string;
@@ -134,6 +131,8 @@ declare module '$env/static/private' {
 	export const PYTHONPATH: string;
 	export const npm_command: string;
 	export const MEMORY_PRESSURE_WRITE: string;
+	export const VTE_VERSION: string;
+	export const ELECTRON_NO_ATTACH_CONSOLE: string;
 	export const CMAKE_PREFIX_PATH: string;
 	export const VSCODE_PID: string;
 	export const INIT_CWD: string;
@@ -168,7 +167,6 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
-		GJS_DEBUG_TOPICS: string;
 		LESSOPEN: string;
 		VSCODE_CWD: string;
 		VSCODE_ESM_ENTRYPOINT: string;
@@ -195,18 +193,16 @@ declare module '$env/dynamic/private' {
 		PYENV_SHELL: string;
 		NVM_INC: string;
 		VSCODE_IPC_HOOK: string;
-		GIO_LAUNCHED_DESKTOP_FILE: string;
 		APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL: string;
 		ROS_PYTHON_VERSION: string;
 		GTK_MODULES: string;
-		MANAGERPID: string;
 		npm_config_userconfig: string;
 		npm_config_local_prefix: string;
 		SYSTEMD_EXEC_PID: string;
 		GSM_SKIP_SSH_AGENT_WORKAROUND: string;
 		DBUS_SESSION_BUS_ADDRESS: string;
+		COLORTERM: string;
 		_CONDA_ROOT: string;
-		GIO_LAUNCHED_DESKTOP_FILE_PID: string;
 		COLOR: string;
 		NVM_DIR: string;
 		VSCODE_CRASH_REPORTER_PROCESS_TYPE: string;
@@ -214,7 +210,6 @@ declare module '$env/dynamic/private' {
 		ROS_DISTRO: string;
 		GTK_IM_MODULE: string;
 		LOGNAME: string;
-		JOURNAL_STREAM: string;
 		_: string;
 		npm_config_prefix: string;
 		npm_config_npm_version: string;
@@ -230,11 +225,11 @@ declare module '$env/dynamic/private' {
 		npm_config_node_gyp: string;
 		PATH: string;
 		SESSION_MANAGER: string;
-		INVOCATION_ID: string;
 		NODE: string;
 		npm_package_name: string;
 		COREPACK_ENABLE_AUTO_PIN: string;
 		XDG_MENU_PREFIX: string;
+		GNOME_TERMINAL_SCREEN: string;
 		XDG_RUNTIME_DIR: string;
 		GDK_BACKEND: string;
 		DISPLAY: string;
@@ -245,6 +240,7 @@ declare module '$env/dynamic/private' {
 		XDG_SESSION_DESKTOP: string;
 		XAUTHORITY: string;
 		LS_COLORS: string;
+		GNOME_TERMINAL_SERVICE: string;
 		npm_lifecycle_script: string;
 		SSH_AUTH_SOCK: string;
 		ROS_DOMAIN_ID: string;
@@ -259,7 +255,6 @@ declare module '$env/dynamic/private' {
 		CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING: string;
 		LESSCLOSE: string;
 		CLAUDECODE: string;
-		GJS_DEBUG_OUTPUT: string;
 		_CONDA_EXE: string;
 		GZ_VERSION: string;
 		ROS_AUTOMATIC_DISCOVERY_RANGE: string;
@@ -267,6 +262,7 @@ declare module '$env/dynamic/private' {
 		npm_config_globalconfig: string;
 		npm_config_init_module: string;
 		PWD: string;
+		VSCODE_CLI: string;
 		npm_execpath: string;
 		CONDA_EXE: string;
 		VSCODE_CODE_CACHE_PATH: string;
@@ -276,6 +272,8 @@ declare module '$env/dynamic/private' {
 		PYTHONPATH: string;
 		npm_command: string;
 		MEMORY_PRESSURE_WRITE: string;
+		VTE_VERSION: string;
+		ELECTRON_NO_ATTACH_CONSOLE: string;
 		CMAKE_PREFIX_PATH: string;
 		VSCODE_PID: string;
 		INIT_CWD: string;

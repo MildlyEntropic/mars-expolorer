@@ -4,9 +4,9 @@
 
 	let { children } = $props();
 
-	const siteUrl = 'https://mars-expolorer.vercel.app';
-	const siteName = 'Space Explorer';
-	const siteDescription = 'Explore NASA imagery from Mars rovers, James Webb Space Telescope, Hubble, and Astronomy Picture of the Day. Browse thousands of real photos from Perseverance, Curiosity, JWST, and more.';
+	const siteUrl = 'https://cosmicmirror.vercel.app';
+	const siteName = 'Cosmic Mirror';
+	const siteDescription = 'A gateway to NASA imagery. Explore Mars rovers, James Webb Space Telescope, Hubble, and Astronomy Picture of the Day. Browse thousands of real photos from Perseverance, Curiosity, JWST, and more.';
 	const siteKeywords = 'NASA, space, Mars, rover, Perseverance, Curiosity, JWST, James Webb, Hubble, APOD, space telescope, astronomy, space photos, NASA images, space exploration, Mars photos, deep space, galaxies, nebula';
 </script>
 
@@ -16,7 +16,7 @@
 	<meta name="title" content="{siteName} - NASA Space Imagery" />
 	<meta name="description" content={siteDescription} />
 	<meta name="keywords" content={siteKeywords} />
-	<meta name="author" content="Space Explorer" />
+	<meta name="author" content="Cosmic Mirror" />
 	<meta name="robots" content="index, follow" />
 	<meta name="language" content="English" />
 	<meta name="revisit-after" content="1 days" />
@@ -47,7 +47,7 @@
 	<meta name="twitter:image" content="{siteUrl}/og-image.svg" />
 
 	<!-- Additional SEO -->
-	<meta name="theme-color" content="#111827" />
+	<meta name="theme-color" content="#030712" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 	<meta name="apple-mobile-web-app-title" content={siteName} />
@@ -68,8 +68,8 @@
 			"priceCurrency": "USD"
 		},
 		"author": {
-			"@type": "Organization",
-			"name": "Space Explorer"
+			"@type": "Person",
+			"name": "Cosmic Mirror"
 		},
 		"provider": {
 			"@type": "Organization",

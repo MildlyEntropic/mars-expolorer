@@ -27,7 +27,7 @@ export {};
 
 declare module "$app/types" {
 	export interface AppTypes {
-		RouteId(): "/" | "/api" | "/api/mer-image" | "/api/mer" | "/mars" | "/telescopes";
+		RouteId(): "/" | "/api" | "/api/mer-image" | "/api/mer" | "/apod" | "/epic" | "/mars" | "/telescopes";
 		RouteParams(): {
 			
 		};
@@ -36,10 +36,12 @@ declare module "$app/types" {
 			"/api": Record<string, never>;
 			"/api/mer-image": Record<string, never>;
 			"/api/mer": Record<string, never>;
+			"/apod": Record<string, never>;
+			"/epic": Record<string, never>;
 			"/mars": Record<string, never>;
 			"/telescopes": Record<string, never>
 		};
-		Pathname(): "/" | "/api" | "/api/" | "/api/mer-image" | "/api/mer-image/" | "/api/mer" | "/api/mer/" | "/mars" | "/mars/" | "/telescopes" | "/telescopes/";
+		Pathname(): "/" | "/api" | "/api/" | "/api/mer-image" | "/api/mer-image/" | "/api/mer" | "/api/mer/" | "/apod" | "/apod/" | "/epic" | "/epic/" | "/mars" | "/mars/" | "/telescopes" | "/telescopes/";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): "/og-image.svg" | "/robots.txt" | "/sitemap.xml" | string & {};
 	}

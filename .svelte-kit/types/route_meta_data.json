@@ -1,12 +1,16 @@
 {
-	"/": [
-		"src/routes/+page.server.ts"
-	],
+	"/": [],
 	"/api/mer-image": [
 		"src/routes/api/mer-image/+server.ts"
 	],
 	"/api/mer": [
 		"src/routes/api/mer/+server.ts"
+	],
+	"/apod": [
+		"src/routes/apod/+page.server.ts"
+	],
+	"/epic": [
+		"src/routes/epic/+page.server.ts"
 	],
 	"/mars": [
 		"src/routes/mars/+page.server.ts"
