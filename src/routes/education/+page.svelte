@@ -200,34 +200,1440 @@
 		return () => clearInterval(interval);
 	});
 
-	// Solar System data
-	const PLANETS = [
-		{ name: 'Mercury', distance: '57.9M km', diameter: '4,879 km', moons: 0, type: 'Terrestrial', color: 'bg-gray-400', fact: 'A day is longer than a year' },
-		{ name: 'Venus', distance: '108.2M km', diameter: '12,104 km', moons: 0, type: 'Terrestrial', color: 'bg-yellow-600', fact: 'Spins backwards compared to most planets' },
-		{ name: 'Earth', distance: '149.6M km', diameter: '12,756 km', moons: 1, type: 'Terrestrial', color: 'bg-blue-500', fact: 'The only known planet with life' },
-		{ name: 'Mars', distance: '227.9M km', diameter: '6,792 km', moons: 2, type: 'Terrestrial', color: 'bg-red-500', fact: 'Home to the tallest mountain in the solar system' },
-		{ name: 'Jupiter', distance: '778.5M km', diameter: '142,984 km', moons: 95, type: 'Gas Giant', color: 'bg-orange-300', fact: 'The Great Red Spot is a storm larger than Earth' },
-		{ name: 'Saturn', distance: '1.43B km', diameter: '120,536 km', moons: 146, type: 'Gas Giant', color: 'bg-amber-200', fact: 'Would float if placed in a giant bathtub' },
-		{ name: 'Uranus', distance: '2.87B km', diameter: '51,118 km', moons: 28, type: 'Ice Giant', color: 'bg-cyan-300', fact: 'Rotates on its side like a rolling ball' },
-		{ name: 'Neptune', distance: '4.5B km', diameter: '49,528 km', moons: 16, type: 'Ice Giant', color: 'bg-blue-600', fact: 'Has the strongest winds in the solar system' }
+	// ============================================
+	// SOLAR SYSTEM DATA
+	// ============================================
+
+	type SolarSystemCategory = 'sol' | 'planets' | 'dwarf-planets' | 'small-bodies';
+
+	interface Moon {
+		name: string;
+		diameter: string;
+		orbitalPeriod: string;
+		discoveredBy?: string;
+		discoveryYear?: number;
+		description: string;
+		notable?: string;
+	}
+
+	interface SolarSystemObject {
+		name: string;
+		type: 'star' | 'planet' | 'dwarf-planet' | 'asteroid' | 'comet' | 'kuiper' | 'trans-neptunian';
+		subtype?: string; // e.g., 'Terrestrial', 'Gas Giant', 'Ice Giant'
+		color: string; // Tailwind bg class
+
+		// Physical characteristics
+		diameter: string;
+		mass: string;
+		gravity?: string;
+		density?: string;
+		rotationPeriod?: string;
+		axialTilt?: string;
+
+		// Orbital characteristics
+		distanceFromSun: string;
+		orbitalPeriod: string;
+		orbitalVelocity?: string;
+		eccentricity?: string;
+		inclination?: string;
+
+		// Atmosphere/composition
+		atmosphere?: string;
+		composition?: string;
+		surfaceTemp?: string;
+
+		// Science data
+		magneticField?: string;
+		rings?: string;
+		notableFeatures?: string[];
+
+		// Humanities/culture
+		etymology: string;
+		mythologyOrigin?: string;
+		culturalSignificance?: string;
+		historicalObservations?: string;
+		symbolism?: string;
+
+		// Exploration
+		missions?: { name: string; year: number; agency: string; type: string; notable?: string }[];
+		upcomingMissions?: { name: string; year: number; agency: string }[];
+
+		// Moons (for planets)
+		moons?: Moon[];
+		moonCount?: number;
+
+		// Imagery
+		nasaImageUrl?: string;
+		nasaFactSheet?: string;
+	}
+
+	// Solar System Categories
+	const SOLAR_SYSTEM_CATEGORIES: { id: SolarSystemCategory; name: string; subtitle: string; count: number }[] = [
+		{ id: 'sol', name: 'Sol', subtitle: 'Our Star', count: 1 },
+		{ id: 'planets', name: 'Planets', subtitle: '8 Major Worlds', count: 8 },
+		{ id: 'dwarf-planets', name: 'Dwarf Planets', subtitle: 'IAU Recognized', count: 5 },
+		{ id: 'small-bodies', name: 'Small Bodies', subtitle: 'Asteroids, Comets & More', count: 15 }
 	];
+
+	let selectedSolarCategory: SolarSystemCategory = $state('sol');
+	let selectedSolarObject: SolarSystemObject | null = $state(null);
+
+	// THE SUN
+	const SOL: SolarSystemObject = {
+		name: 'Sun',
+		type: 'star',
+		subtype: 'G-type Main Sequence (Yellow Dwarf)',
+		color: 'bg-yellow-500',
+
+		diameter: '1,392,700 km (109× Earth)',
+		mass: '1.989 × 10³⁰ kg (333,000× Earth)',
+		gravity: '274 m/s² (28× Earth)',
+		density: '1.408 g/cm³',
+		rotationPeriod: '25.05 days (equator) to 34.4 days (poles)',
+
+		distanceFromSun: '0 (center of Solar System)',
+		orbitalPeriod: '225-250 million years (galactic orbit)',
+		orbitalVelocity: '220 km/s (around galactic center)',
+
+		surfaceTemp: '5,778 K (surface) / 15.7 million K (core)',
+		composition: '73.46% Hydrogen, 24.85% Helium, 1.69% heavier elements',
+		magneticField: 'Complex, reverses every 11 years (solar cycle)',
+
+		notableFeatures: [
+			'Solar flares and coronal mass ejections',
+			'Sunspots (cooler regions ~3,500 K)',
+			'Corona visible during eclipses',
+			'Solar wind extends past Pluto',
+			'Contains 99.86% of Solar System mass',
+			'Fusion converts 600M tons H to He per second'
+		],
+
+		etymology: 'From Latin "sōl", Proto-Indo-European *sóh₂wl̥. Related to Greek Helios.',
+		mythologyOrigin: 'Nearly all ancient cultures deified the Sun. Ra (Egypt), Helios/Apollo (Greece), Sūrya (Hindu), Amaterasu (Japan), Inti (Inca), Tonatiuh (Aztec).',
+		culturalSignificance: 'Central to calendars, agriculture, and religious practices worldwide. Solstices and equinoxes marked by monuments like Stonehenge.',
+		historicalObservations: 'Chinese recorded sunspots by 28 BCE. Galileo proved Sun rotates (1612). Heliocentrism established by Copernicus (1543).',
+		symbolism: 'Represents life, power, knowledge, divinity. The circle with center dot (☉) dates to ancient Egypt.',
+
+		missions: [
+			{ name: 'Parker Solar Probe', year: 2018, agency: 'NASA', type: 'Orbiter', notable: 'Closest approach to Sun ever (6.9 million km)' },
+			{ name: 'Solar Orbiter', year: 2020, agency: 'ESA/NASA', type: 'Orbiter', notable: 'First images of solar poles' },
+			{ name: 'SOHO', year: 1995, agency: 'ESA/NASA', type: 'Observatory', notable: 'Discovered 4,000+ comets' },
+			{ name: 'SDO', year: 2010, agency: 'NASA', type: 'Observatory', notable: 'High-res Sun imaging 24/7' }
+		],
+
+		nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html'
+	};
+
+	// PLANETS
+	const PLANETS_DATA: SolarSystemObject[] = [
+		{
+			name: 'Mercury',
+			type: 'planet',
+			subtype: 'Terrestrial',
+			color: 'bg-gray-400',
+
+			diameter: '4,879 km (0.38× Earth)',
+			mass: '3.30 × 10²³ kg (0.055× Earth)',
+			gravity: '3.7 m/s² (0.38× Earth)',
+			density: '5.43 g/cm³',
+			rotationPeriod: '58.65 Earth days',
+			axialTilt: '0.034°',
+
+			distanceFromSun: '57.9 million km (0.39 AU)',
+			orbitalPeriod: '87.97 Earth days',
+			orbitalVelocity: '47.4 km/s',
+			eccentricity: '0.206 (most eccentric planet)',
+			inclination: '7.0°',
+
+			surfaceTemp: '-180°C to 430°C',
+			atmosphere: 'Exosphere only: O₂, Na, H₂, He, K',
+			magneticField: 'Weak (1% of Earth), dipolar',
+
+			notableFeatures: [
+				'Largest temperature swing of any planet',
+				'Caloris Basin: 1,550 km impact crater',
+				'Ice deposits in polar craters',
+				'Most cratered planet',
+				'Day longer than year (176 Earth days sunrise to sunrise)',
+				'3:2 spin-orbit resonance'
+			],
+
+			etymology: 'Named for Roman messenger god Mercury (Greek: Hermes), due to rapid orbital motion.',
+			mythologyOrigin: 'Mercury/Hermes was the swift messenger of the gods, guide of souls, patron of travelers and thieves.',
+			culturalSignificance: 'Known since Sumerians (3rd millennium BCE). Called "the Jumping One" in Babylon.',
+			historicalObservations: 'Copernicus never saw Mercury. Its phases confirmed by Galileo (1631). Mariner 10 first flyby (1974).',
+			symbolism: 'Symbol ☿ represents caduceus (winged staff). Associated with communication, commerce, speed.',
+
+			missions: [
+				{ name: 'Mariner 10', year: 1974, agency: 'NASA', type: 'Flyby', notable: 'First Mercury images' },
+				{ name: 'MESSENGER', year: 2011, agency: 'NASA', type: 'Orbiter', notable: 'Mapped entire surface' },
+				{ name: 'BepiColombo', year: 2018, agency: 'ESA/JAXA', type: 'Orbiter', notable: 'En route, arrival 2025' }
+			],
+
+			moons: [],
+			moonCount: 0,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html'
+		},
+		{
+			name: 'Venus',
+			type: 'planet',
+			subtype: 'Terrestrial',
+			color: 'bg-amber-300',
+
+			diameter: '12,104 km (0.95× Earth)',
+			mass: '4.87 × 10²⁴ kg (0.82× Earth)',
+			gravity: '8.87 m/s² (0.90× Earth)',
+			density: '5.24 g/cm³',
+			rotationPeriod: '243 Earth days (retrograde)',
+			axialTilt: '177.4° (nearly upside down)',
+
+			distanceFromSun: '108.2 million km (0.72 AU)',
+			orbitalPeriod: '224.7 Earth days',
+			orbitalVelocity: '35.0 km/s',
+			eccentricity: '0.007 (most circular orbit)',
+			inclination: '3.4°',
+
+			surfaceTemp: '465°C average (hottest planet)',
+			atmosphere: '96.5% CO₂, 3.5% N₂. 92× Earth pressure.',
+			composition: 'Silicate mantle, iron core',
+			magneticField: 'None (too slow rotation)',
+
+			notableFeatures: [
+				'Hottest planet due to runaway greenhouse effect',
+				'Spins backwards (retrograde rotation)',
+				'Day longer than year',
+				'Thick clouds of sulfuric acid',
+				'Surface crushed by atmospheric pressure',
+				'Maxwell Montes: highest peak (11 km)'
+			],
+
+			etymology: 'Named for Roman goddess of love and beauty (Greek: Aphrodite).',
+			mythologyOrigin: 'Aphrodite/Venus arose from sea foam when Cronus castrated Uranus. Goddess of love, beauty, fertility.',
+			culturalSignificance: 'Morning/Evening Star confused as two objects anciently. Mayans tracked Venus cycles obsessively.',
+			historicalObservations: 'Galileo observed phases (1610), proving it orbits Sun. Lomonosov discovered atmosphere (1761).',
+			symbolism: 'Symbol ♀ represents mirror of goddess. Associated with femininity, love, art, beauty.',
+
+			missions: [
+				{ name: 'Venera 7', year: 1970, agency: 'USSR', type: 'Lander', notable: 'First successful Venus landing' },
+				{ name: 'Magellan', year: 1990, agency: 'NASA', type: 'Orbiter', notable: 'Radar-mapped 98% of surface' },
+				{ name: 'Akatsuki', year: 2015, agency: 'JAXA', type: 'Orbiter', notable: 'Studying atmosphere' },
+				{ name: 'VERITAS', year: 2031, agency: 'NASA', type: 'Orbiter', notable: 'Future high-res mapping' },
+				{ name: 'DAVINCI', year: 2031, agency: 'NASA', type: 'Probe', notable: 'Atmospheric descent' }
+			],
+
+			moons: [],
+			moonCount: 0,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html'
+		},
+		{
+			name: 'Earth',
+			type: 'planet',
+			subtype: 'Terrestrial',
+			color: 'bg-blue-500',
+
+			diameter: '12,756 km',
+			mass: '5.97 × 10²⁴ kg',
+			gravity: '9.81 m/s²',
+			density: '5.51 g/cm³',
+			rotationPeriod: '23h 56m 4s',
+			axialTilt: '23.44°',
+
+			distanceFromSun: '149.6 million km (1 AU)',
+			orbitalPeriod: '365.25 days',
+			orbitalVelocity: '29.8 km/s',
+			eccentricity: '0.017',
+			inclination: '0° (reference plane)',
+
+			surfaceTemp: '-89°C to 57°C (average 15°C)',
+			atmosphere: '78% N₂, 21% O₂, 1% Ar, 0.04% CO₂',
+			composition: 'Iron core, silicate mantle, thin crust',
+			magneticField: 'Strong dipole, protects from solar wind',
+
+			notableFeatures: [
+				'Only known planet with life',
+				'71% surface covered by liquid water',
+				'Active plate tectonics',
+				'Large stabilizing moon',
+				'Strong magnetic field',
+				'Goldilocks zone location'
+			],
+
+			etymology: 'From Germanic "Ertha" meaning ground/soil. Only planet not named after a deity.',
+			mythologyOrigin: 'Gaia (Greek) / Terra (Roman) personified as primordial mother goddess who bore Titans.',
+			culturalSignificance: 'Mother Earth concept universal. Axis tilt creates seasons, driving agriculture and festivals.',
+			historicalObservations: 'Eratosthenes calculated circumference (240 BCE). First photo from space: 1946 (V-2 rocket).',
+			symbolism: 'Symbol ⊕ or ♁ represents globe with meridian. Associated with fertility, stability, home.',
+
+			missions: [
+				{ name: 'ISS', year: 1998, agency: 'International', type: 'Station', notable: 'Continuous human presence since 2000' },
+				{ name: 'Landsat', year: 1972, agency: 'NASA/USGS', type: 'Earth observation', notable: 'Longest continuous Earth imaging' },
+				{ name: 'DSCOVR', year: 2015, agency: 'NASA', type: 'L1 Observatory', notable: 'Full-disk Earth images (EPIC)' }
+			],
+
+			moons: [
+				{
+					name: 'Moon (Luna)',
+					diameter: '3,474 km',
+					orbitalPeriod: '27.3 days',
+					discoveredBy: 'N/A (visible)',
+					description: 'Earth\'s only natural satellite, 5th largest in Solar System.',
+					notable: 'Tidally locked; same face always toward Earth. 12 humans have walked on its surface.'
+				}
+			],
+			moonCount: 1,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html'
+		},
+		{
+			name: 'Mars',
+			type: 'planet',
+			subtype: 'Terrestrial',
+			color: 'bg-red-500',
+
+			diameter: '6,792 km (0.53× Earth)',
+			mass: '6.42 × 10²³ kg (0.11× Earth)',
+			gravity: '3.71 m/s² (0.38× Earth)',
+			density: '3.93 g/cm³',
+			rotationPeriod: '24h 37m (sol)',
+			axialTilt: '25.2°',
+
+			distanceFromSun: '227.9 million km (1.52 AU)',
+			orbitalPeriod: '687 Earth days',
+			orbitalVelocity: '24.1 km/s',
+			eccentricity: '0.094',
+			inclination: '1.85°',
+
+			surfaceTemp: '-153°C to 20°C (average -65°C)',
+			atmosphere: '95.3% CO₂, 2.7% N₂, 1.6% Ar. 0.6% Earth pressure.',
+			composition: 'Iron oxide (rust) surface, basaltic crust',
+			magneticField: 'Remnant crustal fields only',
+
+			notableFeatures: [
+				'Olympus Mons: tallest mountain (21.9 km)',
+				'Valles Marineris: largest canyon (4,000 km)',
+				'Polar ice caps (water and CO₂)',
+				'Global dust storms',
+				'Evidence of ancient rivers/lakes',
+				'Two small moons: Phobos & Deimos'
+			],
+
+			etymology: 'Named for Roman god of war (Greek: Ares), due to blood-red color.',
+			mythologyOrigin: 'Ares/Mars was god of war, son of Zeus/Jupiter. Romans considered Mars father of Romulus & Remus.',
+			culturalSignificance: 'Red color associated with blood and war across cultures. Mars retrograde was ill omen.',
+			historicalObservations: 'Schiaparelli saw "canali" (1877), misinterpreted as canals. Lowell popularized Mars civilization idea.',
+			symbolism: 'Symbol ♂ represents shield and spear. Associated with masculinity, aggression, energy.',
+
+			missions: [
+				{ name: 'Perseverance', year: 2021, agency: 'NASA', type: 'Rover', notable: 'Collecting samples for return' },
+				{ name: 'Ingenuity', year: 2021, agency: 'NASA', type: 'Helicopter', notable: 'First powered flight on another planet' },
+				{ name: 'Curiosity', year: 2012, agency: 'NASA', type: 'Rover', notable: 'Still operating' },
+				{ name: 'InSight', year: 2018, agency: 'NASA', type: 'Lander', notable: 'Detected marsquakes' },
+				{ name: 'Mars Express', year: 2003, agency: 'ESA', type: 'Orbiter', notable: 'Still operating' }
+			],
+
+			moons: [
+				{
+					name: 'Phobos',
+					diameter: '22.2 km',
+					orbitalPeriod: '7h 39m',
+					discoveredBy: 'Asaph Hall',
+					discoveryYear: 1877,
+					description: 'Larger, inner moon. Heavily cratered, may be captured asteroid.',
+					notable: 'Orbiting closer to Mars; will crash or break apart in ~50 million years.'
+				},
+				{
+					name: 'Deimos',
+					diameter: '12.6 km',
+					orbitalPeriod: '30.3 hours',
+					discoveredBy: 'Asaph Hall',
+					discoveryYear: 1877,
+					description: 'Smaller, outer moon. Smoother surface than Phobos.',
+					notable: 'Named for Greek god of dread (Ares\' companion).'
+				}
+			],
+			moonCount: 2,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html'
+		},
+		{
+			name: 'Jupiter',
+			type: 'planet',
+			subtype: 'Gas Giant',
+			color: 'bg-orange-300',
+
+			diameter: '142,984 km (11.2× Earth)',
+			mass: '1.90 × 10²⁷ kg (318× Earth)',
+			gravity: '24.8 m/s² (2.53× Earth)',
+			density: '1.33 g/cm³',
+			rotationPeriod: '9h 56m (fastest planet)',
+			axialTilt: '3.13°',
+
+			distanceFromSun: '778.5 million km (5.2 AU)',
+			orbitalPeriod: '11.86 Earth years',
+			orbitalVelocity: '13.1 km/s',
+			eccentricity: '0.049',
+			inclination: '1.3°',
+
+			surfaceTemp: '-145°C (cloud tops)',
+			atmosphere: '89.8% H₂, 10.2% He, traces of CH₄, NH₃, H₂O',
+			composition: 'No solid surface. Metallic hydrogen mantle, possible rocky core.',
+			magneticField: 'Strongest planetary field (20,000× Earth)',
+			rings: 'Faint ring system (discovered 1979)',
+
+			notableFeatures: [
+				'Great Red Spot: 350+ year old storm',
+				'Largest planet (2.5× all others combined)',
+				'95 known moons',
+				'Intense radiation belts',
+				'Protects inner planets from asteroids',
+				'Almost became a star (13× more massive needed)'
+			],
+
+			etymology: 'Named for Roman king of gods (Greek: Zeus).',
+			mythologyOrigin: 'Zeus/Jupiter overthrew Titans, ruled Olympus. God of sky, thunder, justice.',
+			culturalSignificance: 'Associated with kingship across cultures. Chinese called it "Year Star" (12-year cycle).',
+			historicalObservations: 'Galileo discovered 4 largest moons (1610), proving not everything orbits Earth.',
+			symbolism: 'Symbol ♃ represents thunderbolt or eagle. Associated with authority, expansion, luck.',
+
+			missions: [
+				{ name: 'Juno', year: 2016, agency: 'NASA', type: 'Orbiter', notable: 'Studying interior and magnetosphere' },
+				{ name: 'Galileo', year: 1995, agency: 'NASA', type: 'Orbiter/Probe', notable: 'First Jupiter orbiter, probe into atmosphere' },
+				{ name: 'Europa Clipper', year: 2024, agency: 'NASA', type: 'Orbiter', notable: 'Investigating Europa\'s ocean' },
+				{ name: 'JUICE', year: 2023, agency: 'ESA', type: 'Orbiter', notable: 'Studying Galilean moons' }
+			],
+
+			moons: [
+				{
+					name: 'Ganymede',
+					diameter: '5,268 km',
+					orbitalPeriod: '7.15 days',
+					discoveredBy: 'Galileo Galilei',
+					discoveryYear: 1610,
+					description: 'Largest moon in Solar System, larger than Mercury.',
+					notable: 'Only moon with its own magnetic field. Has subsurface ocean.'
+				},
+				{
+					name: 'Callisto',
+					diameter: '4,821 km',
+					orbitalPeriod: '16.7 days',
+					discoveredBy: 'Galileo Galilei',
+					discoveryYear: 1610,
+					description: 'Most heavily cratered object in Solar System.',
+					notable: 'May have subsurface ocean. Possible future base site (outside radiation belt).'
+				},
+				{
+					name: 'Io',
+					diameter: '3,643 km',
+					orbitalPeriod: '1.77 days',
+					discoveredBy: 'Galileo Galilei',
+					discoveryYear: 1610,
+					description: 'Most volcanically active body in Solar System.',
+					notable: '400+ active volcanoes. Surface constantly reshaped. Sulfur-colored.'
+				},
+				{
+					name: 'Europa',
+					diameter: '3,122 km',
+					orbitalPeriod: '3.55 days',
+					discoveredBy: 'Galileo Galilei',
+					discoveryYear: 1610,
+					description: 'Ice-covered moon with subsurface ocean.',
+					notable: 'Prime target for life search. Ocean may have 2× Earth\'s water.'
+				}
+			],
+			moonCount: 95,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html'
+		},
+		{
+			name: 'Saturn',
+			type: 'planet',
+			subtype: 'Gas Giant',
+			color: 'bg-amber-200',
+
+			diameter: '120,536 km (9.45× Earth)',
+			mass: '5.68 × 10²⁶ kg (95× Earth)',
+			gravity: '10.4 m/s² (1.06× Earth)',
+			density: '0.69 g/cm³ (would float on water)',
+			rotationPeriod: '10h 42m',
+			axialTilt: '26.7°',
+
+			distanceFromSun: '1.43 billion km (9.58 AU)',
+			orbitalPeriod: '29.46 Earth years',
+			orbitalVelocity: '9.7 km/s',
+			eccentricity: '0.057',
+			inclination: '2.5°',
+
+			surfaceTemp: '-178°C (cloud tops)',
+			atmosphere: '96.3% H₂, 3.25% He, traces of CH₄, NH₃',
+			composition: 'Similar to Jupiter but less dense. Metallic hydrogen layer thinner.',
+			magneticField: 'Strong (600× Earth)',
+			rings: 'Most spectacular ring system (282,000 km diameter, but only 10m thick)',
+
+			notableFeatures: [
+				'Spectacular ring system (99.9% water ice)',
+				'146 known moons',
+				'Least dense planet (would float on water)',
+				'Hexagonal storm at north pole',
+				'Titan: moon with thick atmosphere',
+				'Enceladus: moon with water geysers'
+			],
+
+			etymology: 'Named for Roman god of agriculture and time (Greek: Cronus).',
+			mythologyOrigin: 'Cronus/Saturn was father of Zeus, Titan who ate his children. Ruler of Golden Age.',
+			culturalSignificance: 'Saturn\'s slow orbit (29 years) linked it to time, age, limitation. Saturday named for Saturn.',
+			historicalObservations: 'Galileo saw "ears" (1610). Huygens identified rings (1655). Cassini discovered ring gap (1675).',
+			symbolism: 'Symbol ♄ represents scythe. Associated with time, discipline, endings, agriculture.',
+
+			missions: [
+				{ name: 'Cassini', year: 2004, agency: 'NASA/ESA/ASI', type: 'Orbiter', notable: '13 years of discoveries, ended 2017' },
+				{ name: 'Huygens', year: 2005, agency: 'ESA', type: 'Lander', notable: 'Landed on Titan (first outer solar system landing)' },
+				{ name: 'Dragonfly', year: 2034, agency: 'NASA', type: 'Rotorcraft', notable: 'Will fly on Titan' }
+			],
+
+			moons: [
+				{
+					name: 'Titan',
+					diameter: '5,150 km',
+					orbitalPeriod: '15.95 days',
+					discoveredBy: 'Christiaan Huygens',
+					discoveryYear: 1655,
+					description: 'Second largest moon, only moon with dense atmosphere.',
+					notable: 'Methane lakes and rivers. Earth-like weather cycle. Huygens landed here.'
+				},
+				{
+					name: 'Enceladus',
+					diameter: '504 km',
+					orbitalPeriod: '1.37 days',
+					discoveredBy: 'William Herschel',
+					discoveryYear: 1789,
+					description: 'Icy moon with subsurface ocean and geysers.',
+					notable: 'Water plumes contain organic molecules. Prime astrobiology target.'
+				},
+				{
+					name: 'Mimas',
+					diameter: '396 km',
+					orbitalPeriod: '0.94 days',
+					discoveredBy: 'William Herschel',
+					discoveryYear: 1789,
+					description: 'Small moon with giant Herschel crater.',
+					notable: 'Looks like Death Star from Star Wars.'
+				},
+				{
+					name: 'Iapetus',
+					diameter: '1,470 km',
+					orbitalPeriod: '79.3 days',
+					discoveredBy: 'Giovanni Cassini',
+					discoveryYear: 1671,
+					description: 'Two-toned moon: one side dark, one bright.',
+					notable: 'Has a giant ridge along equator (20 km high).'
+				}
+			],
+			moonCount: 146,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/saturnfact.html'
+		},
+		{
+			name: 'Uranus',
+			type: 'planet',
+			subtype: 'Ice Giant',
+			color: 'bg-cyan-300',
+
+			diameter: '51,118 km (4× Earth)',
+			mass: '8.68 × 10²⁵ kg (14.5× Earth)',
+			gravity: '8.87 m/s² (0.89× Earth)',
+			density: '1.27 g/cm³',
+			rotationPeriod: '17h 14m (retrograde)',
+			axialTilt: '97.8° (rolls on its side)',
+
+			distanceFromSun: '2.87 billion km (19.2 AU)',
+			orbitalPeriod: '84 Earth years',
+			orbitalVelocity: '6.8 km/s',
+			eccentricity: '0.046',
+			inclination: '0.77°',
+
+			surfaceTemp: '-224°C (coldest atmosphere)',
+			atmosphere: '82.5% H₂, 15.2% He, 2.3% CH₄ (gives blue color)',
+			composition: 'Water, methane, ammonia ices over small rocky core',
+			magneticField: 'Unusual: tilted 59° from rotation axis',
+			rings: '13 faint rings (discovered 1977)',
+
+			notableFeatures: [
+				'Rotates on its side (97.8° tilt)',
+				'Coldest planetary atmosphere',
+				'28 known moons (all named from literature)',
+				'Extreme seasons (42 years day/night at poles)',
+				'Faint ring system',
+				'First planet discovered with telescope'
+			],
+
+			etymology: 'Named for Greek god of the sky, father of Cronus/Saturn.',
+			mythologyOrigin: 'Ouranos was primordial sky god, son/husband of Gaia (Earth). Castrated by son Cronus.',
+			culturalSignificance: 'First planet discovered in modern era (1781). Almost named "Georgian Star" for King George III.',
+			historicalObservations: 'Discovered by William Herschel (1781). Voyager 2 only close flyby (1986).',
+			symbolism: 'Symbol ⛢ combines Sun and Mars symbols. Associated with innovation, rebellion, sudden change.',
+
+			missions: [
+				{ name: 'Voyager 2', year: 1986, agency: 'NASA', type: 'Flyby', notable: 'Only spacecraft to visit Uranus' },
+				{ name: 'Uranus Orbiter', year: '2030s', agency: 'NASA (proposed)', type: 'Orbiter', notable: 'Top priority in Planetary Science Decadal Survey' }
+			],
+			upcomingMissions: [
+				{ name: 'Uranus Orbiter & Probe', year: 2031, agency: 'NASA' }
+			],
+
+			moons: [
+				{
+					name: 'Titania',
+					diameter: '1,578 km',
+					orbitalPeriod: '8.7 days',
+					discoveredBy: 'William Herschel',
+					discoveryYear: 1787,
+					description: 'Largest moon of Uranus.',
+					notable: 'Named for Queen of Fairies from A Midsummer Night\'s Dream.'
+				},
+				{
+					name: 'Oberon',
+					diameter: '1,522 km',
+					orbitalPeriod: '13.5 days',
+					discoveredBy: 'William Herschel',
+					discoveryYear: 1787,
+					description: 'Second largest, outermost major moon.',
+					notable: 'Named for King of Fairies. Has a large dark-floored crater.'
+				},
+				{
+					name: 'Miranda',
+					diameter: '472 km',
+					orbitalPeriod: '1.4 days',
+					discoveredBy: 'Gerard Kuiper',
+					discoveryYear: 1948,
+					description: 'Smallest rounded moon. Bizarre, fractured surface.',
+					notable: 'Has Verona Rupes: 20 km cliff, tallest in Solar System.'
+				},
+				{
+					name: 'Ariel',
+					diameter: '1,158 km',
+					orbitalPeriod: '2.5 days',
+					discoveredBy: 'William Lassell',
+					discoveryYear: 1851,
+					description: 'Brightest of Uranian moons.',
+					notable: 'Named from Pope\'s "Rape of the Lock" and Shakespeare\'s "The Tempest".'
+				}
+			],
+			moonCount: 28,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/uranusfact.html'
+		},
+		{
+			name: 'Neptune',
+			type: 'planet',
+			subtype: 'Ice Giant',
+			color: 'bg-blue-600',
+
+			diameter: '49,528 km (3.88× Earth)',
+			mass: '1.02 × 10²⁶ kg (17.1× Earth)',
+			gravity: '11.2 m/s² (1.14× Earth)',
+			density: '1.64 g/cm³',
+			rotationPeriod: '16h 6m',
+			axialTilt: '28.3°',
+
+			distanceFromSun: '4.5 billion km (30.1 AU)',
+			orbitalPeriod: '164.8 Earth years',
+			orbitalVelocity: '5.4 km/s',
+			eccentricity: '0.011',
+			inclination: '1.77°',
+
+			surfaceTemp: '-218°C',
+			atmosphere: '80% H₂, 19% He, 1.5% CH₄',
+			composition: 'Water, methane, ammonia ices. Possible ocean layer.',
+			magneticField: 'Tilted 47° from axis, offset from center',
+			rings: '5 faint rings (discovered 1984)',
+
+			notableFeatures: [
+				'Strongest winds in Solar System (2,100 km/h)',
+				'Great Dark Spot (appeared and vanished)',
+				'16 known moons',
+				'First planet found by mathematical prediction',
+				'Triton: large retrograde moon (captured)',
+				'Farthest known planet'
+			],
+
+			etymology: 'Named for Roman god of the sea (Greek: Poseidon).',
+			mythologyOrigin: 'Poseidon/Neptune ruled the oceans, caused earthquakes. Brother of Zeus and Hades.',
+			culturalSignificance: 'Discovered same year as Marx\'s works and Morse code (1846). Symbol of scientific prediction.',
+			historicalObservations: 'Predicted mathematically by Le Verrier, found by Galle (1846). Voyager 2 flyby (1989).',
+			symbolism: 'Symbol ♆ represents trident. Associated with the unconscious, dreams, illusion, spirituality.',
+
+			missions: [
+				{ name: 'Voyager 2', year: 1989, agency: 'NASA', type: 'Flyby', notable: 'Only spacecraft to visit Neptune' }
+			],
+
+			moons: [
+				{
+					name: 'Triton',
+					diameter: '2,707 km',
+					orbitalPeriod: '5.9 days (retrograde)',
+					discoveredBy: 'William Lassell',
+					discoveryYear: 1846,
+					description: 'Largest moon, orbits backwards. Likely captured Kuiper Belt object.',
+					notable: 'Active nitrogen geysers. Surface at -235°C (coldest measured in Solar System).'
+				},
+				{
+					name: 'Nereid',
+					diameter: '340 km',
+					orbitalPeriod: '360 days',
+					discoveredBy: 'Gerard Kuiper',
+					discoveryYear: 1949,
+					description: 'Highly eccentric orbit.',
+					notable: 'Most eccentric orbit of any moon (0.75).'
+				},
+				{
+					name: 'Proteus',
+					diameter: '420 km',
+					orbitalPeriod: '1.12 days',
+					discoveredBy: 'Voyager 2',
+					discoveryYear: 1989,
+					description: 'Second largest, dark and irregular.',
+					notable: 'Not discovered from Earth due to proximity to Neptune\'s glare.'
+				}
+			],
+			moonCount: 16,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/neptunefact.html'
+		}
+	];
+
+	// DWARF PLANETS
+	const DWARF_PLANETS: SolarSystemObject[] = [
+		{
+			name: 'Pluto',
+			type: 'dwarf-planet',
+			subtype: 'Plutino (3:2 resonance with Neptune)',
+			color: 'bg-amber-600',
+
+			diameter: '2,377 km (0.19× Earth)',
+			mass: '1.31 × 10²² kg (0.2% Earth)',
+			gravity: '0.62 m/s² (0.06× Earth)',
+			density: '1.85 g/cm³',
+			rotationPeriod: '6.39 Earth days (retrograde)',
+			axialTilt: '119.5°',
+
+			distanceFromSun: '5.9 billion km (39.5 AU average)',
+			orbitalPeriod: '248 Earth years',
+			eccentricity: '0.249 (crosses Neptune\'s orbit)',
+			inclination: '17.2°',
+
+			surfaceTemp: '-230°C',
+			atmosphere: 'Thin: N₂, CH₄, CO. Freezes when farther from Sun.',
+			composition: '70% rock, 30% water ice. Nitrogen ice surface.',
+
+			notableFeatures: [
+				'Heart-shaped nitrogen glacier (Tombaugh Regio)',
+				'5 moons including Charon (half Pluto\'s size)',
+				'Orbit crosses inside Neptune\'s',
+				'Red coloration from tholins',
+				'Mountains of water ice',
+				'Was a planet 1930-2006'
+			],
+
+			etymology: 'Named for Roman god of the underworld (Greek: Hades). Name suggested by 11-year-old Venetia Burney.',
+			mythologyOrigin: 'Hades/Pluto ruled the dead. Abducted Persephone. Cerberus guarded his realm.',
+			culturalSignificance: 'Discovered 1930, reclassified as dwarf planet 2006. Sparked public debate about planethood.',
+			historicalObservations: 'Discovered by Clyde Tombaugh at Lowell Observatory. New Horizons flyby revealed complex world (2015).',
+			symbolism: 'Symbol ♇ or ⯓. Associated with transformation, death/rebirth, hidden wealth.',
+
+			missions: [
+				{ name: 'New Horizons', year: 2015, agency: 'NASA', type: 'Flyby', notable: 'First close images of Pluto and Charon' }
+			],
+
+			moons: [
+				{ name: 'Charon', diameter: '1,212 km', orbitalPeriod: '6.39 days', discoveredBy: 'James Christy', discoveryYear: 1978, description: 'Largest moon relative to its planet. Tidally locked.', notable: 'Pluto-Charon considered a binary system.' },
+				{ name: 'Nix', diameter: '50 km', orbitalPeriod: '24.9 days', discoveredBy: 'HST', discoveryYear: 2005, description: 'Small, irregular moon.', notable: 'Tumbles chaotically due to Pluto-Charon gravity.' },
+				{ name: 'Hydra', diameter: '65 km', orbitalPeriod: '38.2 days', discoveredBy: 'HST', discoveryYear: 2005, description: 'Outermost known moon.', notable: 'Rotates 89× per orbit.' }
+			],
+			moonCount: 5,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/plutofact.html'
+		},
+		{
+			name: 'Eris',
+			type: 'dwarf-planet',
+			subtype: 'Scattered Disk Object',
+			color: 'bg-gray-300',
+
+			diameter: '2,326 km (slightly smaller than Pluto)',
+			mass: '1.66 × 10²² kg (27% more massive than Pluto)',
+			gravity: '0.82 m/s²',
+			density: '2.52 g/cm³',
+			rotationPeriod: '25.9 hours',
+
+			distanceFromSun: '10.1 billion km (67.8 AU current, varies 38-97 AU)',
+			orbitalPeriod: '559 Earth years',
+			eccentricity: '0.44',
+			inclination: '44.0°',
+
+			surfaceTemp: '-243°C',
+			atmosphere: 'Thin methane, may collapse when farther from Sun',
+			composition: 'Rock and ice, methane ice surface',
+
+			notableFeatures: [
+				'Most massive known dwarf planet',
+				'Discovery triggered Pluto\'s reclassification',
+				'Extremely eccentric and inclined orbit',
+				'One known moon: Dysnomia',
+				'Brightest known TNO (albedo 0.96)'
+			],
+
+			etymology: 'Named for Greek goddess of strife and discord, for the controversy it caused.',
+			mythologyOrigin: 'Eris started the Trojan War by throwing golden apple "for the fairest" among goddesses.',
+			culturalSignificance: 'Discovery in 2005 forced IAU to define "planet", demoting Pluto in 2006.',
+			historicalObservations: 'Discovered by Mike Brown\'s team (2005). Initially nicknamed "Xena".',
+			symbolism: 'Associated with discord, competition, change. Has astrological symbol ⯰.',
+
+			moons: [
+				{ name: 'Dysnomia', diameter: '700 km', orbitalPeriod: '15.8 days', discoveredBy: 'Keck Observatory', discoveryYear: 2005, description: 'Only known moon of Eris.', notable: 'Named for Eris\'s daughter, goddess of lawlessness.' }
+			],
+			moonCount: 1,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/erisfact.html'
+		},
+		{
+			name: 'Haumea',
+			type: 'dwarf-planet',
+			subtype: 'Classical Kuiper Belt Object',
+			color: 'bg-pink-200',
+
+			diameter: '1,632 km (elongated: 2,322 × 1,704 × 1,138 km)',
+			mass: '4.01 × 10²¹ kg',
+			gravity: '0.44 m/s²',
+			density: '1.88 g/cm³',
+			rotationPeriod: '3.92 hours (one of fastest in Solar System)',
+
+			distanceFromSun: '6.5 billion km (43.3 AU average)',
+			orbitalPeriod: '284 Earth years',
+			eccentricity: '0.19',
+			inclination: '28.2°',
+
+			surfaceTemp: '-241°C',
+			composition: 'Crystalline water ice surface, rocky interior',
+
+			notableFeatures: [
+				'Elongated egg shape from rapid rotation',
+				'Has a ring (first dwarf planet known to)',
+				'Two moons and collisional family',
+				'Fastest rotating large body',
+				'Almost pure water ice surface'
+			],
+
+			etymology: 'Named for Hawaiian goddess of fertility and childbirth.',
+			mythologyOrigin: 'Haumea was mother of Pele and other Hawaiian deities. Her children came from different parts of her body.',
+			culturalSignificance: 'Discovered 2004, recognized 2008. Its moons are named for Haumea\'s daughters.',
+
+			moons: [
+				{ name: 'Hi\'iaka', diameter: '310 km', orbitalPeriod: '49.5 days', discoveredBy: 'Keck', discoveryYear: 2005, description: 'Larger, outer moon.', notable: 'Named for goddess born from Haumea\'s mouth.' },
+				{ name: 'Namaka', diameter: '170 km', orbitalPeriod: '18 days', discoveredBy: 'Keck', discoveryYear: 2005, description: 'Smaller, inner moon.', notable: 'Named for water spirit daughter.' }
+			],
+			moonCount: 2,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/haumeafact.html'
+		},
+		{
+			name: 'Makemake',
+			type: 'dwarf-planet',
+			subtype: 'Classical Kuiper Belt Object',
+			color: 'bg-orange-200',
+
+			diameter: '1,430 km',
+			mass: '3.1 × 10²¹ kg',
+			gravity: '0.5 m/s²',
+			density: '1.7 g/cm³',
+			rotationPeriod: '22.5 hours',
+
+			distanceFromSun: '6.85 billion km (45.8 AU average)',
+			orbitalPeriod: '306 Earth years',
+			eccentricity: '0.16',
+			inclination: '28.96°',
+
+			surfaceTemp: '-243°C',
+			atmosphere: 'May have thin transient atmosphere near perihelion',
+			composition: 'Methane, ethane, nitrogen ices. Reddish color.',
+
+			notableFeatures: [
+				'Second brightest KBO after Pluto',
+				'Extremely red color',
+				'One small moon',
+				'No detected atmosphere',
+				'Originally nicknamed "Easterbunny"'
+			],
+
+			etymology: 'Named for Rapa Nui (Easter Island) creator god.',
+			mythologyOrigin: 'Makemake was chief god of Easter Island, creator of humanity, god of fertility and birds.',
+			culturalSignificance: 'Discovered near Easter 2005, formally named 2008 to honor Rapa Nui culture.',
+
+			moons: [
+				{ name: 'MK2 (S/2015 (136472) 1)', diameter: '175 km', orbitalPeriod: '12.4 days', discoveredBy: 'HST', discoveryYear: 2015, description: 'Small, dark moon.', notable: 'Very dark compared to bright Makemake.' }
+			],
+			moonCount: 1,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/makemakefact.html'
+		},
+		{
+			name: 'Ceres',
+			type: 'dwarf-planet',
+			subtype: 'Asteroid Belt Object',
+			color: 'bg-gray-400',
+
+			diameter: '939 km',
+			mass: '9.39 × 10²⁰ kg (1.3% of Moon)',
+			gravity: '0.28 m/s²',
+			density: '2.16 g/cm³',
+			rotationPeriod: '9.07 hours',
+
+			distanceFromSun: '414 million km (2.77 AU)',
+			orbitalPeriod: '4.6 Earth years',
+			eccentricity: '0.076',
+			inclination: '10.6°',
+
+			surfaceTemp: '-105°C average',
+			atmosphere: 'Transient water vapor plumes detected',
+			composition: 'Clay minerals, ice. Differentiated with rocky core.',
+
+			notableFeatures: [
+				'Largest asteroid belt object',
+				'Contains 1/3 of belt\'s total mass',
+				'Bright spots (Occator crater salts)',
+				'Was first asteroid discovered (1801)',
+				'Has subsurface briny water',
+				'Only dwarf planet in inner Solar System'
+			],
+
+			etymology: 'Named for Roman goddess of harvest and agriculture (Greek: Demeter).',
+			mythologyOrigin: 'Ceres/Demeter was goddess of grain, fertility, seasons. Her grief caused winter when Persephone was in underworld.',
+			culturalSignificance: 'First asteroid discovered (Piazzi, 1801). Word "cereal" derives from Ceres.',
+
+			missions: [
+				{ name: 'Dawn', year: 2015, agency: 'NASA', type: 'Orbiter', notable: 'First to orbit two extraterrestrial bodies (Vesta, then Ceres)' }
+			],
+
+			moonCount: 0,
+			nasaFactSheet: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/ceresfact.html'
+		}
+	];
+
+	// SMALL BODIES (Asteroids, Comets, Kuiper Belt Objects)
+	const SMALL_BODIES: SolarSystemObject[] = [
+		// ASTEROIDS
+		{
+			name: 'Vesta',
+			type: 'asteroid',
+			subtype: 'V-type Asteroid',
+			color: 'bg-stone-400',
+
+			diameter: '525 km (second largest asteroid)',
+			mass: '2.59 × 10²⁰ kg',
+			rotationPeriod: '5.34 hours',
+
+			distanceFromSun: '353 million km (2.36 AU average)',
+			orbitalPeriod: '3.63 Earth years',
+
+			surfaceTemp: '-20°C (day) to -190°C (night)',
+			composition: 'Basaltic rock. Differentiated with iron core.',
+
+			notableFeatures: [
+				'Brightest asteroid (visible to naked eye)',
+				'Only asteroid with differentiated interior',
+				'Giant south pole crater (Rheasilvia)',
+				'Source of HED meteorites on Earth'
+			],
+
+			etymology: 'Named for Roman goddess of hearth and home (Greek: Hestia).',
+			mythologyOrigin: 'Vesta/Hestia was eldest Olympian, goddess of hearth fire. Vestal Virgins tended her eternal flame.',
+
+			missions: [
+				{ name: 'Dawn', year: 2011, agency: 'NASA', type: 'Orbiter', notable: 'Orbited Vesta for 14 months' }
+			]
+		},
+		{
+			name: 'Pallas',
+			type: 'asteroid',
+			subtype: 'B-type Asteroid',
+			color: 'bg-slate-400',
+
+			diameter: '512 km (third largest asteroid)',
+			mass: '2.04 × 10²⁰ kg',
+			rotationPeriod: '7.81 hours',
+
+			distanceFromSun: '414 million km (2.77 AU average)',
+			orbitalPeriod: '4.62 Earth years',
+			inclination: '34.8° (highest of large asteroids)',
+
+			composition: 'Carbonaceous, hydrated minerals',
+
+			notableFeatures: [
+				'Highly inclined orbit makes it hard to reach',
+				'Second asteroid discovered (1802)',
+				'Possible source of CM chondrites'
+			],
+
+			etymology: 'Named for Pallas Athena, Greek goddess of wisdom.',
+			mythologyOrigin: 'Athena took epithet "Pallas" after accidentally killing her friend Pallas during sparring.'
+		},
+		{
+			name: 'Hygiea',
+			type: 'asteroid',
+			subtype: 'C-type Asteroid',
+			color: 'bg-neutral-500',
+
+			diameter: '434 km (fourth largest)',
+			mass: '8.32 × 10¹⁹ kg',
+			rotationPeriod: '27.6 hours',
+
+			distanceFromSun: '470 million km (3.14 AU average)',
+			orbitalPeriod: '5.56 Earth years',
+
+			composition: 'Carbonaceous, primitive',
+
+			notableFeatures: [
+				'Nearly spherical (may qualify as dwarf planet)',
+				'Darkest of "big four" asteroids',
+				'Largest C-type asteroid'
+			],
+
+			etymology: 'Named for Hygieia, Greek goddess of health.',
+			mythologyOrigin: 'Hygieia was daughter of Asclepius, god of medicine. Word "hygiene" derives from her name.'
+		},
+		{
+			name: 'Bennu',
+			type: 'asteroid',
+			subtype: 'B-type Near-Earth Asteroid',
+			color: 'bg-stone-600',
+
+			diameter: '490 m (Empire State Building height)',
+			mass: '7.8 × 10¹⁰ kg',
+			rotationPeriod: '4.3 hours',
+
+			distanceFromSun: '168 million km (1.13 AU average)',
+			orbitalPeriod: '1.2 Earth years',
+
+			composition: 'Carbon-rich, hydrated minerals, organic molecules',
+
+			notableFeatures: [
+				'Potentially hazardous (impact possible 2182)',
+				'Sample returned to Earth (2023)',
+				'Rubble-pile structure',
+				'Contains water and organics'
+			],
+
+			etymology: 'Named by 9-year-old contest winner for Egyptian deity.',
+			mythologyOrigin: 'Bennu was Egyptian bird deity linked to creation, rebirth, and the Sun god Ra.',
+
+			missions: [
+				{ name: 'OSIRIS-REx', year: 2020, agency: 'NASA', type: 'Sample Return', notable: 'Collected 121.6g sample, returned 2023' }
+			]
+		},
+		{
+			name: 'Ryugu',
+			type: 'asteroid',
+			subtype: 'C-type Near-Earth Asteroid',
+			color: 'bg-stone-700',
+
+			diameter: '900 m',
+			mass: '4.5 × 10¹¹ kg',
+			rotationPeriod: '7.63 hours',
+
+			distanceFromSun: '180 million km (1.19 AU average)',
+			orbitalPeriod: '1.3 Earth years',
+
+			composition: 'Carbonaceous, very dark (albedo 0.02)',
+
+			notableFeatures: [
+				'Spinning-top shape',
+				'Sample returned to Earth (2020)',
+				'Extremely dark surface',
+				'Rubble-pile, very porous'
+			],
+
+			etymology: 'Named for Dragon Palace from Japanese folk tale Urashima Tarō.',
+			mythologyOrigin: 'In the tale, fisherman visits undersea Dragon Palace and returns with mysterious box.',
+
+			missions: [
+				{ name: 'Hayabusa2', year: 2018, agency: 'JAXA', type: 'Sample Return', notable: 'Returned 5.4g sample with amino acids' }
+			]
+		},
+		// COMETS
+		{
+			name: 'Halley\'s Comet',
+			type: 'comet',
+			subtype: 'Short-period Halley-type',
+			color: 'bg-cyan-200',
+
+			diameter: '15 km × 8 km (nucleus)',
+			mass: '2.2 × 10¹⁴ kg',
+			rotationPeriod: '52 hours',
+
+			distanceFromSun: '0.59 AU (perihelion) to 35.1 AU (aphelion)',
+			orbitalPeriod: '75-79 years',
+			eccentricity: '0.967',
+			inclination: '162° (retrograde)',
+
+			composition: 'Dirty snowball: water ice, dust, organics, CO, CO₂',
+
+			notableFeatures: [
+				'Most famous comet',
+				'Visible to naked eye',
+				'Recorded since 240 BCE',
+				'Next perihelion: July 28, 2061',
+				'Parent of Eta Aquariid and Orionid meteor showers'
+			],
+
+			etymology: 'Named for Edmond Halley who predicted its return.',
+			mythologyOrigin: 'Comets historically seen as omens. Halley\'s appeared before Norman Conquest (1066), depicted in Bayeux Tapestry.',
+			culturalSignificance: 'First comet proven periodic (1705). Mark Twain born and died with its appearances (1835, 1910).',
+
+			missions: [
+				{ name: 'Giotto', year: 1986, agency: 'ESA', type: 'Flyby', notable: 'First close-up of comet nucleus' },
+				{ name: 'Vega 1 & 2', year: 1986, agency: 'USSR', type: 'Flyby', notable: 'Guided Giotto to target' }
+			]
+		},
+		{
+			name: 'Comet 67P/Churyumov-Gerasimenko',
+			type: 'comet',
+			subtype: 'Jupiter-family comet',
+			color: 'bg-stone-500',
+
+			diameter: '4.3 km × 4.1 km (duck-shaped)',
+			mass: '9.98 × 10¹² kg',
+			rotationPeriod: '12.4 hours',
+
+			distanceFromSun: '1.24 AU (perihelion) to 5.68 AU (aphelion)',
+			orbitalPeriod: '6.45 years',
+
+			composition: 'Very dark (albedo 0.06), fluffy. Water, CO₂, organics.',
+
+			notableFeatures: [
+				'Bilobate "rubber duck" shape',
+				'First comet orbited and landed on',
+				'Extremely dark surface',
+				'Very low density (0.47 g/cm³)',
+				'Contains glycine (amino acid)'
+			],
+
+			etymology: 'Named for discoverers Klim Churyumov and Svetlana Gerasimenko (1969).',
+
+			missions: [
+				{ name: 'Rosetta', year: 2014, agency: 'ESA', type: 'Orbiter', notable: 'First comet orbiter, 2 year mission' },
+				{ name: 'Philae', year: 2014, agency: 'ESA', type: 'Lander', notable: 'First comet landing (bounced 3 times)' }
+			]
+		},
+		{
+			name: 'Comet Hale-Bopp',
+			type: 'comet',
+			subtype: 'Long-period',
+			color: 'bg-blue-200',
+
+			diameter: '40-80 km (nucleus)',
+			mass: 'Unknown (very large)',
+			rotationPeriod: '11.5 hours',
+
+			distanceFromSun: '0.91 AU (perihelion) to 370 AU (aphelion)',
+			orbitalPeriod: '2,533 years',
+			inclination: '89.4°',
+
+			composition: 'Unusually active, high CO production',
+
+			notableFeatures: [
+				'Great Comet of 1997',
+				'Visible for 18 months (record)',
+				'Visible to naked eye even in cities',
+				'Exceptionally large nucleus',
+				'Double tail clearly visible'
+			],
+
+			etymology: 'Named for co-discoverers Alan Hale and Thomas Bopp (1995).',
+			culturalSignificance: 'Most widely observed comet ever. Tragically linked to Heaven\'s Gate cult.'
+		},
+		// KUIPER BELT OBJECTS
+		{
+			name: 'Quaoar',
+			type: 'kuiper',
+			subtype: 'Classical Kuiper Belt Object (Cubewano)',
+			color: 'bg-rose-300',
+
+			diameter: '1,121 km',
+			mass: '1.2 × 10²¹ kg',
+			rotationPeriod: '17.7 hours',
+
+			distanceFromSun: '6.5 billion km (43.7 AU average)',
+			orbitalPeriod: '289 years',
+
+			composition: 'Water ice, methane ice, crystalline ammonia',
+			rings: 'Has a ring (discovered 2023)',
+
+			notableFeatures: [
+				'Has rings beyond Roche limit (unexplained)',
+				'One moon: Weywot',
+				'Named before discovery of Haumea/Makemake',
+				'Third largest cubewano'
+			],
+
+			etymology: 'Named for Tongva people\'s creator god.',
+			mythologyOrigin: 'Quaoar was creator deity of Tongva (Los Angeles area indigenous people), who sang and danced creation into being.'
+		},
+		{
+			name: 'Sedna',
+			type: 'trans-neptunian',
+			subtype: 'Sednoid / Inner Oort Cloud',
+			color: 'bg-red-300',
+
+			diameter: '995 km',
+			mass: '~1 × 10²¹ kg',
+			rotationPeriod: '~10 hours',
+
+			distanceFromSun: '76 AU (current) to 937 AU (aphelion)',
+			orbitalPeriod: '11,400 years',
+			eccentricity: '0.855',
+			inclination: '11.9°',
+
+			surfaceTemp: '-240°C',
+			composition: 'Methane, nitrogen ices. Very red.',
+
+			notableFeatures: [
+				'Extremely distant elliptical orbit',
+				'Perihelion beyond Neptune (76 AU)',
+				'One of reddest objects in Solar System',
+				'Orbit suggests Planet Nine influence',
+				'Never close enough for Neptune interaction'
+			],
+
+			etymology: 'Named for Inuit goddess of the sea and marine animals.',
+			mythologyOrigin: 'Sedna\'s father threw her from a boat; her severed fingers became sea creatures. She rules the cold ocean depths.',
+			culturalSignificance: 'Discovered 2003. Its orbit helped inspire Planet Nine hypothesis.'
+		},
+		{
+			name: 'Arrokoth (Ultima Thule)',
+			type: 'kuiper',
+			subtype: 'Classical Kuiper Belt Object (Cold)',
+			color: 'bg-red-400',
+
+			diameter: '36 km × 20 km (contact binary)',
+			mass: '~7.5 × 10¹⁵ kg',
+			rotationPeriod: '15.9 hours',
+
+			distanceFromSun: '6.7 billion km (44.6 AU average)',
+			orbitalPeriod: '298 years',
+			eccentricity: '0.042 (very circular)',
+			inclination: '2.45°',
+
+			surfaceTemp: '-230°C',
+			composition: 'Methanol, water ice, organics. Very red.',
+
+			notableFeatures: [
+				'Most distant object ever visited by spacecraft',
+				'Snowman/pancake contact binary',
+				'Primordial: unchanged since formation',
+				'Very cold classical KBO (low inclination)',
+				'Reddest object visited by spacecraft'
+			],
+
+			etymology: 'Arrokoth means "sky" in Powhatan language. Originally nicknamed "Ultima Thule".',
+			culturalSignificance: 'New Horizons flyby (2019) showed most primitive solar system body yet seen.',
+
+			missions: [
+				{ name: 'New Horizons', year: 2019, agency: 'NASA', type: 'Flyby', notable: 'Most distant flyby in history (6.5 billion km)' }
+			]
+		},
+		{
+			name: 'Orcus',
+			type: 'kuiper',
+			subtype: 'Plutino (3:2 resonance)',
+			color: 'bg-slate-300',
+
+			diameter: '910 km',
+			mass: '6.4 × 10²⁰ kg',
+			rotationPeriod: 'Unknown (tidally locked to moon?)',
+
+			distanceFromSun: '5.9 billion km (39.2 AU average)',
+			orbitalPeriod: '247 years',
+
+			composition: 'Water ice, ammonia, methane ices',
+
+			notableFeatures: [
+				'Anti-Pluto (opposite orbital phase)',
+				'Large moon Vanth (half Orcus\' size)',
+				'May be dwarf planet candidate',
+				'Water ice and ammonia detected'
+			],
+
+			etymology: 'Named for Etruscan/Roman god of the underworld.',
+			mythologyOrigin: 'Orcus was punisher of broken oaths, sometimes conflated with Pluto/Hades. Origin of word "ogre".',
+
+			moons: [
+				{ name: 'Vanth', diameter: '443 km', orbitalPeriod: '9.5 days', discoveredBy: 'HST', discoveryYear: 2005, description: 'Large moon, may be tidally locked.', notable: 'Named for Etruscan psychopomp who guides souls.' }
+			]
+		}
+	];
+
+	// Helper function to get objects by category
+	function getSolarSystemObjects(category: SolarSystemCategory): SolarSystemObject[] {
+		switch (category) {
+			case 'sol': return [SOL];
+			case 'planets': return PLANETS_DATA;
+			case 'dwarf-planets': return DWARF_PLANETS;
+			case 'small-bodies': return SMALL_BODIES;
+			default: return [];
+		}
+	}
+
+	function openSolarObject(obj: SolarSystemObject) {
+		selectedSolarObject = obj;
+	}
+
+	function closeSolarObject() {
+		selectedSolarObject = null;
+	}
 
 	// Hall of Fame - Space Pioneers
 	const PIONEERS = {
 		animals: [
-			{ name: 'Laika', species: 'Dog', year: 1957, mission: 'Sputnik 2', country: 'USSR', achievement: 'First animal to orbit Earth', fate: 'Did not survive re-entry' },
-			{ name: 'Belka & Strelka', species: 'Dogs', year: 1960, mission: 'Sputnik 5', country: 'USSR', achievement: 'First animals to orbit and return alive', fate: 'Lived full lives' },
-			{ name: 'Ham', species: 'Chimpanzee', year: 1961, mission: 'Mercury-Redstone 2', country: 'USA', achievement: 'First hominid in space', fate: 'Lived 22 more years' },
-			{ name: 'Félicette', species: 'Cat', year: 1963, mission: 'Véronique AG1', country: 'France', achievement: 'First cat in space', fate: 'Returned safely' },
-			{ name: 'Fruit Flies', species: 'Insects', year: 1947, mission: 'V-2 Rocket', country: 'USA', achievement: 'First animals in space', fate: 'Recovered alive' }
+			// Suborbital Flights
+			{ name: 'Fruit Flies', species: 'Insects', year: 1947, mission: 'V-2 Rocket', country: 'USA', achievement: 'First animals in space', fate: 'Recovered alive via parachute', category: 'suborbital' },
+			{ name: 'Albert II', species: 'Rhesus Monkey', year: 1949, mission: 'V-2 Blossom IV', country: 'USA', achievement: 'First primate in space', fate: 'Died on impact', category: 'suborbital' },
+			{ name: 'Tsygan & Dezik', species: 'Dogs', year: 1951, mission: 'R-1 IIIA-1', country: 'USSR', achievement: 'First dogs in space', fate: 'Both recovered alive', category: 'suborbital' },
+			{ name: 'Yorick (Albert VI)', species: 'Monkey & Mice', year: 1951, mission: 'Aerobee', country: 'USA', achievement: 'First primates to survive spaceflight', fate: 'Died hours after landing', category: 'suborbital' },
+			{ name: 'Ham', species: 'Chimpanzee', year: 1961, mission: 'Mercury-Redstone 2', country: 'USA', achievement: 'First hominid in space (suborbital)', fate: 'Lived 22 more years at National Zoo', category: 'suborbital' },
+			{ name: 'Félicette', species: 'Cat', year: 1963, mission: 'Véronique AG1', country: 'France', achievement: 'First and only cat in space', fate: 'Returned safely; statue in Paris', category: 'suborbital' },
+			// Orbital Flights
+			{ name: 'Laika', species: 'Dog', year: 1957, mission: 'Sputnik 2', country: 'USSR', achievement: 'First animal to orbit Earth', fate: 'Did not survive (overheating)', category: 'orbital' },
+			{ name: 'Belka & Strelka', species: 'Dogs', year: 1960, mission: 'Sputnik 5', country: 'USSR', achievement: 'First animals to orbit and return alive', fate: 'Lived full lives; Strelka had puppies', category: 'orbital' },
+			{ name: 'Enos', species: 'Chimpanzee', year: 1961, mission: 'Mercury-Atlas 5', country: 'USA', achievement: 'First chimp to orbit Earth', fate: 'Recovered safely; died a year later', category: 'orbital' },
+			{ name: 'Zvezdochka', species: 'Dog', year: 1961, mission: 'Sputnik 10', country: 'USSR', achievement: 'Final test flight before Gagarin', fate: 'Recovered safely; named by Gagarin', category: 'orbital' },
+			{ name: 'Veterok & Ugolyok', species: 'Dogs', year: 1966, mission: 'Cosmos 110', country: 'USSR', achievement: '22 days in orbit (record until Skylab)', fate: 'Recovered alive', category: 'orbital' },
+			// Deep Space
+			{ name: 'Tortoises', species: 'Horsfield Tortoises', year: 1968, mission: 'Zond 5', country: 'USSR', achievement: 'First animals around the Moon', fate: 'Returned safely to Earth', category: 'deep' },
+			// Modern Era
+			{ name: 'Tardigrades', species: 'Micro-animals', year: 2007, mission: 'FOTON-M3', country: 'ESA', achievement: 'First animals to survive vacuum of space', fate: 'Many survived direct space exposure', category: 'modern' },
+			{ name: 'Nematode Worms', species: 'C. elegans', year: 2003, mission: 'STS-107 Columbia', country: 'USA', achievement: 'Survived shuttle breakup', fate: 'Found alive in debris', category: 'modern' }
 		],
-		humans: [
-			{ name: 'Yuri Gagarin', year: 1961, mission: 'Vostok 1', country: 'USSR', achievement: 'First human in space' },
-			{ name: 'Valentina Tereshkova', year: 1963, mission: 'Vostok 6', country: 'USSR', achievement: 'First woman in space' },
-			{ name: 'Alexei Leonov', year: 1965, mission: 'Voskhod 2', country: 'USSR', achievement: 'First spacewalk' },
-			{ name: 'Neil Armstrong', year: 1969, mission: 'Apollo 11', country: 'USA', achievement: 'First human on the Moon' },
-			{ name: 'Sally Ride', year: 1983, mission: 'STS-7', country: 'USA', achievement: 'First American woman in space' },
-			{ name: 'Mae Jemison', year: 1992, mission: 'STS-47', country: 'USA', achievement: 'First African American woman in space' }
+		firsts: [
+			// Orbital Firsts
+			{ name: 'Yuri Gagarin', year: 1961, mission: 'Vostok 1', country: 'USSR', achievement: 'First human in space', category: 'orbital', duration: '108 minutes' },
+			{ name: 'Alan Shepard', year: 1961, mission: 'Freedom 7', country: 'USA', achievement: 'First American in space (suborbital)', category: 'orbital', duration: '15 minutes' },
+			{ name: 'John Glenn', year: 1962, mission: 'Friendship 7', country: 'USA', achievement: 'First American to orbit Earth', category: 'orbital', duration: '4h 55m' },
+			{ name: 'Valentina Tereshkova', year: 1963, mission: 'Vostok 6', country: 'USSR', achievement: 'First woman in space', category: 'orbital', duration: '2d 22h' },
+			{ name: 'Yang Liwei', year: 2003, mission: 'Shenzhou 5', country: 'China', achievement: 'First Chinese taikonaut', category: 'orbital', duration: '21h 23m' },
+			// EVA Firsts
+			{ name: 'Alexei Leonov', year: 1965, mission: 'Voskhod 2', country: 'USSR', achievement: 'First spacewalk (EVA)', category: 'eva', duration: '12 minutes' },
+			{ name: 'Ed White', year: 1965, mission: 'Gemini 4', country: 'USA', achievement: 'First American spacewalk', category: 'eva', duration: '23 minutes' },
+			{ name: 'Svetlana Savitskaya', year: 1984, mission: 'Salyut 7', country: 'USSR', achievement: 'First woman to spacewalk', category: 'eva', duration: '3h 35m' },
+			{ name: 'Kathryn Sullivan', year: 1984, mission: 'STS-41-G', country: 'USA', achievement: 'First American woman to spacewalk', category: 'eva', duration: '3h 29m' },
+			// Lunar Firsts
+			{ name: 'Frank Borman, Jim Lovell, Bill Anders', year: 1968, mission: 'Apollo 8', country: 'USA', achievement: 'First humans to orbit the Moon', category: 'lunar', duration: '20 orbits' },
+			{ name: 'Neil Armstrong', year: 1969, mission: 'Apollo 11', country: 'USA', achievement: 'First human to walk on the Moon', category: 'lunar', duration: '2h 31m on surface' },
+			{ name: 'Buzz Aldrin', year: 1969, mission: 'Apollo 11', country: 'USA', achievement: 'Second human on the Moon', category: 'lunar', duration: '2h 31m on surface' },
+			{ name: 'Pete Conrad', year: 1969, mission: 'Apollo 12', country: 'USA', achievement: 'Third human on the Moon; precision landing', category: 'lunar', duration: '7h 45m on surface' },
+			{ name: 'Alan Shepard', year: 1971, mission: 'Apollo 14', country: 'USA', achievement: 'Hit golf balls on the Moon', category: 'lunar', duration: '9h 21m on surface' },
+			{ name: 'David Scott', year: 1971, mission: 'Apollo 15', country: 'USA', achievement: 'First lunar rover driver', category: 'lunar', duration: '18h 33m on surface' },
+			{ name: 'Eugene Cernan', year: 1972, mission: 'Apollo 17', country: 'USA', achievement: 'Last human on the Moon (so far)', category: 'lunar', duration: '22h 4m on surface' },
+			{ name: 'Harrison Schmitt', year: 1972, mission: 'Apollo 17', country: 'USA', achievement: 'Only scientist to walk on the Moon', category: 'lunar', duration: '22h 4m on surface' }
+		],
+		barriers: [
+			// Diversity Firsts
+			{ name: 'Sally Ride', year: 1983, mission: 'STS-7', country: 'USA', achievement: 'First American woman in space', note: 'Also first LGBTQ+ astronaut (revealed posthumously)' },
+			{ name: 'Guion Bluford', year: 1983, mission: 'STS-8', country: 'USA', achievement: 'First African American in space', note: 'Flew on four Space Shuttle missions' },
+			{ name: 'Judith Resnik', year: 1984, mission: 'STS-41-D', country: 'USA', achievement: 'Second American woman in space', note: 'Lost on Challenger (1986)' },
+			{ name: 'Mae Jemison', year: 1992, mission: 'STS-47', country: 'USA', achievement: 'First African American woman in space', note: 'Physician, engineer, and dancer' },
+			{ name: 'Franklin Chang-Díaz', year: 1986, mission: 'STS-61-C', country: 'USA', achievement: 'First Hispanic American in space', note: 'Tied record with 7 spaceflights' },
+			{ name: 'Ellison Onizuka', year: 1985, mission: 'STS-51-C', country: 'USA', achievement: 'First Asian American in space', note: 'Lost on Challenger (1986)' },
+			{ name: 'Rakesh Sharma', year: 1984, mission: 'Soyuz T-11', country: 'India', achievement: 'First Indian in space', note: 'Only Indian to fly in space' },
+			{ name: 'Sultan bin Salman', year: 1985, mission: 'STS-51-G', country: 'Saudi Arabia', achievement: 'First Arab and Muslim in space', note: 'Also first royal in space' },
+			{ name: 'Chiaki Mukai', year: 1994, mission: 'STS-65', country: 'Japan', achievement: 'First Japanese woman in space', note: 'Cardiovascular surgeon' },
+			{ name: 'Ilan Ramon', year: 2003, mission: 'STS-107', country: 'Israel', achievement: 'First Israeli in space', note: 'Lost on Columbia disaster' },
+			{ name: 'Yi So-yeon', year: 2008, mission: 'Soyuz TMA-12', country: 'South Korea', achievement: 'First Korean in space', note: 'Selected through reality TV contest' },
+			{ name: 'Anousheh Ansari', year: 2006, mission: 'Soyuz TMA-9', country: 'Iran/USA', achievement: 'First female space tourist; first Iranian in space', note: 'Self-funded via Space Adventures' },
+			{ name: 'Jessica Watkins', year: 2022, mission: 'SpaceX Crew-4', country: 'USA', achievement: 'First Black woman on long-duration spaceflight', note: 'Geologist and ISS crew member' },
+			{ name: 'Victor Glover', year: 2020, mission: 'SpaceX Crew-1', country: 'USA', achievement: 'First Black astronaut on long-duration ISS mission', note: 'Also pilot of Crew Dragon' }
+		],
+		endurance: [
+			// Long-Duration Records
+			{ name: 'Valeri Polyakov', year: '1994-95', mission: 'Mir EO-4', country: 'Russia', achievement: 'Longest single spaceflight: 437 days', note: 'Medical doctor; studied long-duration effects' },
+			{ name: 'Gennady Padalka', year: '1998-2015', mission: 'Multiple', country: 'Russia', achievement: 'Most total time in space: 879 days', note: 'Five spaceflights over 17 years' },
+			{ name: 'Peggy Whitson', year: '2002-2017', mission: 'Multiple', country: 'USA', achievement: 'Most time in space by American: 665 days', note: 'First female ISS commander' },
+			{ name: 'Scott Kelly', year: '2015-16', mission: 'Year in Space', country: 'USA', achievement: '340 days continuous (US record)', note: 'Twin study with brother Mark' },
+			{ name: 'Christina Koch', year: '2019-20', mission: 'ISS Exp 59-61', country: 'USA', achievement: 'Longest single spaceflight by woman: 328 days', note: 'First all-female spacewalk' },
+			{ name: 'Frank Rubio', year: '2022-23', mission: 'ISS Exp 68-69', country: 'USA', achievement: 'New US record: 371 days', note: 'Extended due to Soyuz leak' },
+			{ name: 'Oleg Kononenko', year: '2024', mission: 'ISS Exp 70-71', country: 'Russia', achievement: 'First person to spend 1,000 days in space', note: 'Reached milestone on Feb 4, 2024' }
+		],
+		commanders: [
+			// Notable Station Commanders
+			{ name: 'Bill Shepherd', year: 2000, mission: 'ISS Exp 1', country: 'USA', achievement: 'First ISS Commander', note: 'Navy SEAL and astronaut' },
+			{ name: 'Peggy Whitson', year: 2008, mission: 'ISS Exp 16', country: 'USA', achievement: 'First female ISS Commander', note: 'Commanded ISS twice' },
+			{ name: 'Sunita Williams', year: 2012, mission: 'ISS Exp 33', country: 'USA', achievement: 'Second female ISS Commander', note: 'Set spacewalk record for women' },
+			{ name: 'Samantha Cristoforetti', year: 2022, mission: 'ISS Exp 68', country: 'Italy', achievement: 'First European female ISS Commander', note: 'ESA astronaut' },
+			{ name: 'Liu Yang', year: 2012, mission: 'Shenzhou 9', country: 'China', achievement: 'First Chinese woman in space', note: 'Fighter pilot' },
+			{ name: 'Wang Yaping', year: 2021, mission: 'Shenzhou 13', country: 'China', achievement: 'First Chinese woman to spacewalk', note: 'Teacher in space' }
+		],
+		memorial: [
+			// Fallen Astronauts
+			{ name: 'Vladimir Komarov', year: 1967, mission: 'Soyuz 1', country: 'USSR', cause: 'Parachute failure on re-entry', note: 'First human spaceflight fatality' },
+			{ name: 'Apollo 1 Crew', year: 1967, mission: 'Apollo 1', country: 'USA', cause: 'Launch pad fire', members: 'Gus Grissom, Ed White, Roger Chaffee' },
+			{ name: 'Soyuz 11 Crew', year: 1971, mission: 'Soyuz 11', country: 'USSR', cause: 'Cabin depressurization', members: 'Dobrovolsky, Volkov, Patsayev', note: 'Only humans to die in space' },
+			{ name: 'Challenger Crew', year: 1986, mission: 'STS-51-L', country: 'USA', cause: 'O-ring failure at launch', members: 'Scobee, Smith, McNair, Onizuka, Resnik, Jarvis, McAuliffe', note: 'First Teacher in Space died' },
+			{ name: 'Columbia Crew', year: 2003, mission: 'STS-107', country: 'USA', cause: 'Heat shield damage on re-entry', members: 'Husband, McCool, Anderson, Brown, Chawla, Clark, Ramon', note: 'First Israeli astronaut died' }
+		],
+		astronomers: [
+			// Ancient & Classical
+			{ name: 'Aristarchus of Samos', era: 'c. 310–230 BCE', country: 'Greece', achievement: 'First heliocentric model', contribution: 'Proposed Sun-centered solar system 1,800 years before Copernicus', category: 'ancient' },
+			{ name: 'Hipparchus', era: 'c. 190–120 BCE', country: 'Greece', achievement: 'Star catalog & magnitude system', contribution: 'Created first comprehensive star catalog; invented stellar magnitude scale still used today', category: 'ancient' },
+			{ name: 'Ptolemy', era: 'c. 100–170 CE', country: 'Egypt (Roman)', achievement: 'Almagest & geocentric model', contribution: 'Definitive ancient astronomical text; dominated for 1,400 years', category: 'ancient' },
+			{ name: 'Aryabhata', era: '476–550 CE', country: 'India', achievement: 'Earth rotation & eclipses', contribution: 'Proposed Earth rotates on axis; calculated accurate eclipse predictions', category: 'ancient' },
+			{ name: 'Al-Sufi', era: '903–986 CE', country: 'Persia', achievement: 'Book of Fixed Stars', contribution: 'First recorded observation of Andromeda Galaxy; revised star catalog', category: 'ancient' },
+			{ name: 'Ulugh Beg', era: '1394–1449', country: 'Timurid (Uzbekistan)', achievement: 'Samarkand Observatory', contribution: 'Most accurate star positions before telescopes; calculated year length to seconds', category: 'ancient' },
+			// Scientific Revolution
+			{ name: 'Nicolaus Copernicus', era: '1473–1543', country: 'Poland', achievement: 'Heliocentric revolution', contribution: 'De revolutionibus: Sun-centered model that launched modern astronomy', category: 'revolution' },
+			{ name: 'Tycho Brahe', era: '1546–1601', country: 'Denmark', achievement: 'Precision naked-eye observations', contribution: 'Most accurate pre-telescope data; observed supernova 1572', category: 'revolution' },
+			{ name: 'Johannes Kepler', era: '1571–1630', country: 'Germany', achievement: 'Laws of planetary motion', contribution: 'Three laws describing elliptical orbits; foundation of celestial mechanics', category: 'revolution' },
+			{ name: 'Galileo Galilei', era: '1564–1642', country: 'Italy', achievement: 'Telescopic astronomy', contribution: 'First telescopic observations: Jupiter\'s moons, Saturn\'s rings, Venus phases, sunspots', category: 'revolution' },
+			{ name: 'Christiaan Huygens', era: '1629–1695', country: 'Netherlands', achievement: 'Saturn\'s rings & Titan', contribution: 'Identified Saturn\'s rings; discovered Titan; invented pendulum clock', category: 'revolution' },
+			{ name: 'Isaac Newton', era: '1643–1727', country: 'England', achievement: 'Universal gravitation', contribution: 'Principia: unified terrestrial and celestial mechanics; reflecting telescope', category: 'revolution' },
+			{ name: 'Edmond Halley', era: '1656–1742', country: 'England', achievement: 'Cometary orbits', contribution: 'Predicted return of Halley\'s Comet; stellar proper motion; southern star catalog', category: 'revolution' },
+			// 18th-19th Century
+			{ name: 'William Herschel', era: '1738–1822', country: 'Germany/England', achievement: 'Discovered Uranus', contribution: 'Found Uranus, infrared radiation, many moons; mapped Milky Way structure', category: 'classical' },
+			{ name: 'Caroline Herschel', era: '1750–1848', country: 'Germany/England', achievement: 'First professional female astronomer', contribution: 'Discovered 8 comets and several nebulae; first woman to receive salary for scientific work', category: 'classical' },
+			{ name: 'Pierre-Simon Laplace', era: '1749–1827', country: 'France', achievement: 'Celestial mechanics', contribution: 'Mécanique Céleste: definitive work on planetary motions; nebular hypothesis', category: 'classical' },
+			{ name: 'Friedrich Bessel', era: '1784–1846', country: 'Germany', achievement: 'First stellar parallax', contribution: 'First measurement of star distance (61 Cygni); predicted Neptune', category: 'classical' },
+			{ name: 'Annie Jump Cannon', era: '1863–1941', country: 'USA', achievement: 'Stellar classification', contribution: 'Classified 350,000+ stars; created OBAFGKM spectral sequence', category: 'classical' },
+			{ name: 'Henrietta Swan Leavitt', era: '1868–1921', country: 'USA', achievement: 'Period-luminosity relation', contribution: 'Cepheid variable discovery enabling measurement of cosmic distances', category: 'classical' },
+			{ name: 'Cecilia Payne-Gaposchkin', era: '1900–1979', country: 'UK/USA', achievement: 'Stellar composition', contribution: 'Discovered stars are mainly hydrogen and helium; first female Harvard astronomy professor', category: 'classical' },
+			// Modern Era
+			{ name: 'Albert Einstein', era: '1879–1955', country: 'Germany/USA', achievement: 'General relativity', contribution: 'Spacetime curvature; predicted gravitational lensing, waves, black holes', category: 'modern' },
+			{ name: 'Edwin Hubble', era: '1889–1953', country: 'USA', achievement: 'Expanding universe', contribution: 'Proved galaxies exist beyond Milky Way; discovered universe expansion', category: 'modern' },
+			{ name: 'Georges Lemaître', era: '1894–1966', country: 'Belgium', achievement: 'Big Bang theory', contribution: 'First proposed expanding universe from "primeval atom" (Big Bang)', category: 'modern' },
+			{ name: 'Subrahmanyan Chandrasekhar', era: '1910–1995', country: 'India/USA', achievement: 'Chandrasekhar limit', contribution: 'Maximum mass of white dwarfs; stellar evolution theory; Nobel 1983', category: 'modern' },
+			{ name: 'Fred Hoyle', era: '1915–2001', country: 'UK', achievement: 'Stellar nucleosynthesis', contribution: 'Explained how elements form in stars; coined "Big Bang" (ironically, as critic)', category: 'modern' },
+			{ name: 'Vera Rubin', era: '1928–2016', country: 'USA', achievement: 'Dark matter evidence', contribution: 'Galaxy rotation curves proving dark matter existence', category: 'modern' },
+			{ name: 'Carl Sagan', era: '1934–1996', country: 'USA', achievement: 'Science communication', contribution: 'Cosmos series; planetary science; SETI advocate; inspired generations', category: 'modern' },
+			{ name: 'Stephen Hawking', era: '1942–2018', country: 'UK', achievement: 'Black hole radiation', contribution: 'Hawking radiation; singularity theorems; A Brief History of Time', category: 'modern' },
+			{ name: 'Jocelyn Bell Burnell', era: '1943–', country: 'UK', achievement: 'Pulsar discovery', contribution: 'Discovered first pulsar as graduate student (Nobel went to her supervisor)', category: 'modern' },
+			// Contemporary
+			{ name: 'Andrea Ghez', era: '1965–', country: 'USA', achievement: 'Sagittarius A* black hole', contribution: 'Proved supermassive black hole at Milky Way center; Nobel 2020', category: 'contemporary' },
+			{ name: 'Reinhard Genzel', era: '1952–', country: 'Germany', achievement: 'Galactic center observations', contribution: 'Decades tracking stars orbiting Sgr A*; Nobel 2020', category: 'contemporary' },
+			{ name: 'Kip Thorne', era: '1940–', country: 'USA', achievement: 'Gravitational waves', contribution: 'LIGO co-founder; gravitational wave detection; Nobel 2017', category: 'contemporary' },
+			{ name: 'Jill Tarter', era: '1944–', country: 'USA', achievement: 'SETI research', contribution: 'Pioneered Search for Extraterrestrial Intelligence; inspired Contact', category: 'contemporary' },
+			{ name: 'Neil deGrasse Tyson', era: '1958–', country: 'USA', achievement: 'Science communication', contribution: 'Hayden Planetarium director; Cosmos revival; public science advocate', category: 'contemporary' },
+			{ name: 'Katie Bouman', era: '1989–', country: 'USA', achievement: 'Black hole imaging', contribution: 'Led algorithm development for first black hole image (M87*)', category: 'contemporary' }
+		],
+		unsungHeroes: [
+			// Hidden Figures - NASA Human Computers
+			{ name: 'Katherine Johnson', era: '1918–2020', role: 'Mathematician', organization: 'NASA Langley', achievement: 'Calculated trajectories for Mercury, Apollo 11, and Apollo 13', contribution: 'Her calculations were so trusted that John Glenn refused to fly until she personally verified the computer\'s numbers. Presidential Medal of Freedom 2015.', category: 'hidden-figures' },
+			{ name: 'Dorothy Vaughan', era: '1910–2008', role: 'Mathematician & Programmer', organization: 'NASA Langley', achievement: 'First African American supervisor at NACA/NASA', contribution: 'Led the West Area Computing unit; became expert FORTRAN programmer; taught herself and her staff to program IBM computers.', category: 'hidden-figures' },
+			{ name: 'Mary Jackson', era: '1921–2005', role: 'Engineer', organization: 'NASA Langley', achievement: 'NASA\'s first Black female engineer', contribution: 'Petitioned city of Hampton to attend whites-only classes; later became manager of Federal Women\'s Program, working to hire and promote women.', category: 'hidden-figures' },
+			{ name: 'Christine Darden', era: '1942–', role: 'Aeronautical Engineer', organization: 'NASA Langley', achievement: 'Sonic boom minimization research', contribution: 'One of few Black women in engineering at NASA; pioneered supersonic flight research; authored over 50 papers.', category: 'hidden-figures' },
+			{ name: 'Miriam Mann', era: '1907–1967', role: 'Mathematician', organization: 'NASA Langley', achievement: 'Removed "Colored Computers" cafeteria sign', contribution: 'Repeatedly took down segregation signs; mathematician who worked on trajectory calculations.', category: 'hidden-figures' },
+			// Early Rocket Engineers
+			{ name: 'Mary Sherman Morgan', era: '1921–2004', role: 'Rocket Scientist', organization: 'North American Aviation', achievement: 'Invented Hydyne rocket fuel', contribution: 'Only female engineer among 900 at NAA; her fuel powered Explorer 1 (America\'s first satellite). Kept secret for 50 years.', category: 'engineers' },
+			{ name: 'JoAnn Morgan', era: '1940–', role: 'Engineer', organization: 'NASA Kennedy', achievement: 'Only woman in Apollo 11 firing room', contribution: 'First female senior executive at Kennedy Space Center; oversaw shuttle and space station programs.', category: 'engineers' },
+			{ name: 'Margaret Hamilton', era: '1936–', role: 'Computer Scientist', organization: 'MIT/NASA', achievement: 'Apollo guidance software', contribution: 'Coined term "software engineering"; her code prevented Apollo 11 abort during landing. Presidential Medal of Freedom 2016.', category: 'engineers' },
+			{ name: 'Poppy Northcutt', era: '1943–', role: 'Engineer', organization: 'TRW', achievement: 'First woman in Mission Control', contribution: 'Calculated return-to-Earth trajectories for Apollo missions; later became prominent women\'s rights advocate.', category: 'engineers' },
+			// Mission Control & Support
+			{ name: 'John Aaron', era: '1943–', role: 'Flight Controller', organization: 'NASA Mission Control', achievement: '"Steely-Eyed Missile Man"', contribution: 'Saved Apollo 12 (lightning strike: "SCE to AUX") and helped save Apollo 13; legendary problem-solver.', category: 'mission-control' },
+			{ name: 'Sy Liebergot', era: '1936–', role: 'EECOM Controller', organization: 'NASA Mission Control', achievement: 'Apollo 13 crisis management', contribution: 'First to recognize oxygen tank explosion; led electrical system troubleshooting that helped bring crew home.', category: 'mission-control' },
+			{ name: 'Jack Garman', era: '1944–2016', role: 'Computer Engineer', organization: 'NASA Mission Control', achievement: 'Apollo 11 computer alarms', contribution: 'Recognized 1202 alarm was safe to ignore during Apollo 11 landing, preventing an abort.', category: 'mission-control' },
+			// Test Pilots & Support
+			{ name: 'Jack King', era: '1931–2015', role: 'Public Affairs Officer', organization: 'NASA Kennedy', achievement: '"Voice of Apollo"', contribution: 'Countdown voice for Apollo launches; his "10, 9, 8..." became iconic sound of space age.', category: 'support' },
+			{ name: 'Wally Funk', era: '1939–', role: 'Aviator', organization: 'Mercury 13', achievement: 'Passed astronaut tests in 1961', contribution: 'One of Mercury 13 women who passed NASA tests but were denied due to gender; finally flew to space in 2021 at age 82 on Blue Origin.', category: 'support' },
+			{ name: 'Jerrie Cobb', era: '1931–2019', role: 'Aviator', organization: 'Mercury 13', achievement: 'First woman to pass astronaut tests', contribution: 'Scored higher than many male astronauts on tests; testified before Congress; became humanitarian pilot in Amazon.', category: 'support' },
+			// International Contributors
+			{ name: 'Maryam Mirzakhani', era: '1977–2017', role: 'Mathematician', organization: 'Stanford', achievement: 'First woman to win Fields Medal', contribution: 'Groundbreaking work on Riemann surfaces and their moduli spaces; theoretical mathematics with cosmological applications.', category: 'international' },
+			{ name: 'Claudia Alexander', era: '1959–2015', role: 'Planetary Scientist', organization: 'NASA JPL', achievement: 'Rosetta Project Scientist', contribution: 'Led U.S. participation in ESA\'s Rosetta comet mission; research on magnetospheres of Jupiter and Saturn.', category: 'international' },
+			{ name: 'Chien-Shiung Wu', era: '1912–1997', role: 'Physicist', organization: 'Columbia University', achievement: 'Disproved parity conservation', contribution: '"First Lady of Physics"; her experiment disproved a fundamental physics law (Nobel went to male colleagues who proposed theory).', category: 'international' }
 		]
 	};
 
@@ -3756,70 +5162,532 @@
 
 			<!-- Solar System Section -->
 			{:else if activeSection === 'solar-system'}
-				<div class="space-y-6">
-					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-						{#each PLANETS as planet}
-							<div class="bg-white/[0.02] border {currentColors.border} p-4 space-y-3">
-								<div class="flex items-center gap-3">
-									<div class="w-8 h-8 rounded-full {planet.color}"></div>
+				<div class="flex flex-col lg:flex-row gap-6">
+					<!-- Category Sidebar -->
+					<div class="lg:w-56 flex-shrink-0 space-y-2 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+						{#each SOLAR_SYSTEM_CATEGORIES as category}
+							<button
+								onclick={() => { selectedSolarCategory = category.id; selectedSolarObject = null; }}
+								class="w-full text-left p-3 border transition-all duration-200 {selectedSolarCategory === category.id
+									? 'bg-orange-500/20 border-orange-500/50'
+									: 'bg-white/[0.02] border-white/10 hover:border-orange-500/30'}"
+							>
+								<div class="flex items-center justify-between">
 									<div>
-										<h4 class="text-sm font-medium tracking-wider text-white/90">{planet.name}</h4>
-										<p class="text-[10px] tracking-wider {currentColors.text} uppercase">{planet.type}</p>
+										<div class="text-sm font-medium tracking-wider text-white/90">{category.name}</div>
+										<div class="text-[10px] tracking-wider {selectedSolarCategory === category.id ? 'text-orange-400/70' : 'text-white/30'}">{category.subtitle}</div>
 									</div>
+									<span class="text-xs text-white/30">{category.count}</span>
 								</div>
-								<div class="space-y-1 text-xs text-white/50">
-									<p><span class="text-white/30">Distance:</span> {planet.distance}</p>
-									<p><span class="text-white/30">Diameter:</span> {planet.diameter}</p>
-									<p><span class="text-white/30">Moons:</span> {planet.moons}</p>
-								</div>
-								<p class="text-xs {currentColors.text} italic border-t border-white/5 pt-2">{planet.fact}</p>
-							</div>
+							</button>
 						{/each}
+					</div>
+
+					<!-- Objects Grid -->
+					<div class="flex-1">
+						<div class="mb-4 flex items-center gap-4">
+							<span class="text-xs tracking-[0.2em] text-orange-400/70 uppercase">
+								{SOLAR_SYSTEM_CATEGORIES.find(c => c.id === selectedSolarCategory)?.name}
+							</span>
+							<span class="text-xs text-white/30">
+								{SOLAR_SYSTEM_CATEGORIES.find(c => c.id === selectedSolarCategory)?.subtitle}
+							</span>
+						</div>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+							{#each getSolarSystemObjects(selectedSolarCategory) as obj}
+								<button
+									onclick={() => openSolarObject(obj)}
+									class="group text-left bg-white/[0.02] border border-white/10 hover:border-orange-500/40 p-4 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10"
+								>
+									<div class="flex items-start gap-3">
+										<div class="w-12 h-12 rounded-full {obj.color} flex-shrink-0 flex items-center justify-center">
+											{#if obj.type === 'star'}
+												<svg class="w-6 h-6 text-yellow-900" fill="currentColor" viewBox="0 0 24 24">
+													<circle cx="12" cy="12" r="5"/>
+													<path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+												</svg>
+											{:else if obj.type === 'comet'}
+												<svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<circle cx="18" cy="6" r="3" stroke-width="2"/>
+													<path stroke-width="2" d="M15 9l-12 12M14 10l-10 8M16 8l-8 10"/>
+												</svg>
+											{:else}
+												<span class="text-lg font-bold text-white/70">{obj.name.charAt(0)}</span>
+											{/if}
+										</div>
+										<div class="flex-1 min-w-0">
+											<h4 class="text-sm font-medium tracking-wider text-white/90 group-hover:text-orange-400 transition-colors">{obj.name}</h4>
+											<p class="text-[10px] tracking-wider text-orange-400/70 uppercase">{obj.subtype || obj.type}</p>
+											<p class="text-xs text-white/50 mt-1">{obj.diameter}</p>
+										</div>
+									</div>
+									<div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+										<span class="text-[10px] text-white/30">{obj.distanceFromSun}</span>
+										<span class="text-[10px] text-orange-400/50 uppercase tracking-wider group-hover:text-orange-400 transition-colors">Details →</span>
+									</div>
+								</button>
+							{/each}
+						</div>
 					</div>
 				</div>
 
 			<!-- Hall of Fame Section -->
 			{:else if activeSection === 'hall-of-fame'}
 				<div class="space-y-8">
-					<!-- Animal Pioneers -->
-					<div class="bg-white/[0.02] border {currentColors.border} p-6">
-						<h3 class="text-lg font-medium tracking-wider {currentColors.accent} uppercase mb-4">Animal Pioneers</h3>
-						<p class="text-xs text-white/40 mb-4">In honor of the brave creatures who paved the way for human spaceflight</p>
-						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-							{#each PIONEERS.animals as animal}
-								<div class="bg-white/[0.02] border border-white/5 p-4 space-y-2">
-									<div class="flex items-start justify-between">
+					<!-- In Memoriam - At the top to honor the fallen -->
+					<div class="bg-white/[0.02] border border-white/20 p-6">
+						<div class="flex items-center gap-3 mb-4">
+							<svg class="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-width="1.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+							</svg>
+							<h3 class="text-lg font-medium tracking-wider text-white/80 uppercase">In Memoriam</h3>
+						</div>
+						<p class="text-xs text-white/40 mb-4">Those who gave their lives in the pursuit of space exploration</p>
+						<div class="space-y-4">
+							{#each PIONEERS.memorial as fallen}
+								<div class="bg-black/30 border border-white/10 p-4">
+									<div class="flex items-start justify-between mb-2">
 										<div>
-											<h4 class="text-sm font-medium tracking-wider text-white/90">{animal.name}</h4>
-											<p class="text-[10px] tracking-wider {currentColors.text} uppercase">{animal.species} - {animal.year}</p>
+											<h4 class="text-sm font-medium tracking-wider text-white/90">{fallen.name}</h4>
+											<p class="text-[10px] tracking-wider text-white/50 uppercase">{fallen.mission} • {fallen.year}</p>
 										</div>
-										<span class="text-[10px] tracking-wider text-white/30 uppercase">{animal.country}</span>
+										<span class="text-[10px] tracking-wider text-white/30 uppercase">{fallen.country}</span>
 									</div>
-									<p class="text-xs text-white/50">{animal.mission}</p>
-									<p class="text-xs {currentColors.text}">{animal.achievement}</p>
-									<p class="text-[10px] text-white/30 italic">{animal.fate}</p>
+									<p class="text-xs text-white/60 mb-1">{fallen.cause}</p>
+									{#if fallen.members}
+										<p class="text-[10px] text-white/40">{fallen.members}</p>
+									{/if}
+									{#if fallen.note}
+										<p class="text-[10px] text-white/30 italic mt-1">{fallen.note}</p>
+									{/if}
 								</div>
 							{/each}
 						</div>
 					</div>
 
-					<!-- Human Pioneers -->
-					<div class="bg-white/[0.02] border {currentColors.border} p-6">
-						<h3 class="text-lg font-medium tracking-wider {currentColors.accent} uppercase mb-4">Human Pioneers</h3>
-						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-							{#each PIONEERS.humans as person}
-								<div class="bg-white/[0.02] border border-white/5 p-4 space-y-2">
-									<div class="flex items-start justify-between">
-										<div>
-											<h4 class="text-sm font-medium tracking-wider text-white/90">{person.name}</h4>
-											<p class="text-[10px] tracking-wider {currentColors.text} uppercase">{person.year}</p>
+					<!-- Historic Firsts -->
+					<div class="bg-white/[0.02] border border-amber-500/30 p-6">
+						<div class="flex items-center gap-3 mb-4">
+							<svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+							</svg>
+							<h3 class="text-lg font-medium tracking-wider text-amber-400 uppercase">Historic Firsts</h3>
+						</div>
+
+						<!-- Orbital Firsts -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-amber-400/70 uppercase mb-3 border-b border-amber-500/20 pb-2">Orbital Pioneers</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.firsts.filter(f => f.category === 'orbital') as person}
+									<div class="bg-white/[0.02] border border-amber-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.country}</span>
 										</div>
-										<span class="text-[10px] tracking-wider text-white/30 uppercase">{person.country}</span>
+										<p class="text-[10px] text-amber-400/70">{person.mission} • {person.year}</p>
+										<p class="text-xs text-amber-400">{person.achievement}</p>
+										{#if person.duration}
+											<p class="text-[10px] text-white/40">Duration: {person.duration}</p>
+										{/if}
 									</div>
-									<p class="text-xs text-white/50">{person.mission}</p>
-									<p class="text-xs {currentColors.text}">{person.achievement}</p>
+								{/each}
+							</div>
+						</div>
+
+						<!-- EVA Firsts -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-amber-400/70 uppercase mb-3 border-b border-amber-500/20 pb-2">Spacewalk Pioneers</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+								{#each PIONEERS.firsts.filter(f => f.category === 'eva') as person}
+									<div class="bg-white/[0.02] border border-amber-500/20 p-3 space-y-1">
+										<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+										<p class="text-[10px] text-amber-400/70">{person.mission} • {person.year}</p>
+										<p class="text-xs text-amber-400">{person.achievement}</p>
+										{#if person.duration}
+											<p class="text-[10px] text-white/40">{person.duration}</p>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Lunar Firsts -->
+						<div>
+							<h4 class="text-xs tracking-[0.2em] text-amber-400/70 uppercase mb-3 border-b border-amber-500/20 pb-2">Lunar Explorers</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+								{#each PIONEERS.firsts.filter(f => f.category === 'lunar') as person}
+									<div class="bg-white/[0.02] border border-amber-500/20 p-3 space-y-1">
+										<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+										<p class="text-[10px] text-amber-400/70">{person.mission} • {person.year}</p>
+										<p class="text-xs text-amber-400">{person.achievement}</p>
+										{#if person.duration}
+											<p class="text-[10px] text-white/40">{person.duration}</p>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					</div>
+
+					<!-- Breaking Barriers -->
+					<div class="bg-white/[0.02] border border-violet-500/30 p-6">
+						<div class="flex items-center gap-3 mb-4">
+							<svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+							</svg>
+							<h3 class="text-lg font-medium tracking-wider text-violet-400 uppercase">Breaking Barriers</h3>
+						</div>
+						<p class="text-xs text-white/40 mb-4">Pioneers who opened doors for underrepresented groups in space exploration</p>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+							{#each PIONEERS.barriers as person}
+								<div class="bg-white/[0.02] border border-violet-500/20 p-3 space-y-1">
+									<div class="flex items-start justify-between">
+										<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+										<span class="text-[10px] text-white/30 uppercase">{person.country}</span>
+									</div>
+									<p class="text-[10px] text-violet-400/70">{person.mission} • {person.year}</p>
+									<p class="text-xs text-violet-400">{person.achievement}</p>
+									{#if person.note}
+										<p class="text-[10px] text-white/40 italic">{person.note}</p>
+									{/if}
 								</div>
 							{/each}
+						</div>
+					</div>
+
+					<!-- Endurance Records -->
+					<div class="bg-white/[0.02] border border-cyan-500/30 p-6">
+						<div class="flex items-center gap-3 mb-4">
+							<svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+							</svg>
+							<h3 class="text-lg font-medium tracking-wider text-cyan-400 uppercase">Endurance Records</h3>
+						</div>
+						<p class="text-xs text-white/40 mb-4">Those who pushed the limits of human duration in space</p>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+							{#each PIONEERS.endurance as person}
+								<div class="bg-white/[0.02] border border-cyan-500/20 p-3 space-y-1">
+									<div class="flex items-start justify-between">
+										<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+										<span class="text-[10px] text-white/30 uppercase">{person.country}</span>
+									</div>
+									<p class="text-[10px] text-cyan-400/70">{person.mission} • {person.year}</p>
+									<p class="text-xs text-cyan-400">{person.achievement}</p>
+									{#if person.note}
+										<p class="text-[10px] text-white/40 italic">{person.note}</p>
+									{/if}
+								</div>
+							{/each}
+						</div>
+					</div>
+
+					<!-- Station Commanders -->
+					<div class="bg-white/[0.02] border border-emerald-500/30 p-6">
+						<div class="flex items-center gap-3 mb-4">
+							<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+							</svg>
+							<h3 class="text-lg font-medium tracking-wider text-emerald-400 uppercase">Station Commanders</h3>
+						</div>
+						<p class="text-xs text-white/40 mb-4">Leaders of orbital outposts</p>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+							{#each PIONEERS.commanders as person}
+								<div class="bg-white/[0.02] border border-emerald-500/20 p-3 space-y-1">
+									<div class="flex items-start justify-between">
+										<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+										<span class="text-[10px] text-white/30 uppercase">{person.country}</span>
+									</div>
+									<p class="text-[10px] text-emerald-400/70">{person.mission} • {person.year}</p>
+									<p class="text-xs text-emerald-400">{person.achievement}</p>
+									{#if person.note}
+										<p class="text-[10px] text-white/40 italic">{person.note}</p>
+									{/if}
+								</div>
+							{/each}
+						</div>
+					</div>
+
+					<!-- Astronomers & Scientists -->
+					<div class="bg-white/[0.02] border border-sky-500/30 p-6">
+						<div class="flex items-center gap-3 mb-4">
+							<svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<circle cx="12" cy="12" r="3" stroke-width="1.5"/>
+								<path stroke-width="1.5" d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+							</svg>
+							<h3 class="text-lg font-medium tracking-wider text-sky-400 uppercase">Astronomers & Scientists</h3>
+						</div>
+						<p class="text-xs text-white/40 mb-4">Those who expanded our understanding of the cosmos through observation, theory, and discovery</p>
+
+						<!-- Ancient & Medieval -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-sky-400/70 uppercase mb-3 border-b border-sky-500/20 pb-2">Ancient & Medieval</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.astronomers.filter(a => a.category === 'ancient') as person}
+									<div class="bg-white/[0.02] border border-sky-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.country}</span>
+										</div>
+										<p class="text-[10px] text-sky-400/70">{person.era}</p>
+										<p class="text-xs text-sky-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Scientific Revolution -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-sky-400/70 uppercase mb-3 border-b border-sky-500/20 pb-2">Scientific Revolution</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.astronomers.filter(a => a.category === 'revolution') as person}
+									<div class="bg-white/[0.02] border border-sky-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.country}</span>
+										</div>
+										<p class="text-[10px] text-sky-400/70">{person.era}</p>
+										<p class="text-xs text-sky-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Classical Era (18th-19th Century) -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-sky-400/70 uppercase mb-3 border-b border-sky-500/20 pb-2">18th–19th Century</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.astronomers.filter(a => a.category === 'classical') as person}
+									<div class="bg-white/[0.02] border border-sky-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.country}</span>
+										</div>
+										<p class="text-[10px] text-sky-400/70">{person.era}</p>
+										<p class="text-xs text-sky-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Modern Era (20th Century) -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-sky-400/70 uppercase mb-3 border-b border-sky-500/20 pb-2">20th Century</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.astronomers.filter(a => a.category === 'modern') as person}
+									<div class="bg-white/[0.02] border border-sky-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.country}</span>
+										</div>
+										<p class="text-[10px] text-sky-400/70">{person.era}</p>
+										<p class="text-xs text-sky-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Contemporary -->
+						<div>
+							<h4 class="text-xs tracking-[0.2em] text-sky-400/70 uppercase mb-3 border-b border-sky-500/20 pb-2">Contemporary</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.astronomers.filter(a => a.category === 'contemporary') as person}
+									<div class="bg-white/[0.02] border border-sky-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.country}</span>
+										</div>
+										<p class="text-[10px] text-sky-400/70">{person.era}</p>
+										<p class="text-xs text-sky-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+					</div>
+
+					<!-- Unsung Heroes -->
+					<div class="bg-white/[0.02] border border-rose-500/30 p-6">
+						<div class="flex items-center gap-3 mb-4">
+							<svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+							</svg>
+							<h3 class="text-lg font-medium tracking-wider text-rose-400 uppercase">Unsung Heroes</h3>
+						</div>
+						<p class="text-xs text-white/40 mb-4">The mathematicians, engineers, and support staff who made space exploration possible but rarely received recognition</p>
+
+						<!-- Hidden Figures -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-rose-400/70 uppercase mb-3 border-b border-rose-500/20 pb-2">Hidden Figures — NASA Human Computers</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+								{#each PIONEERS.unsungHeroes.filter(h => h.category === 'hidden-figures') as person}
+									<div class="bg-white/[0.02] border border-rose-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.organization}</span>
+										</div>
+										<p class="text-[10px] text-rose-400/70">{person.role} • {person.era}</p>
+										<p class="text-xs text-rose-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Engineers & Programmers -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-rose-400/70 uppercase mb-3 border-b border-rose-500/20 pb-2">Engineers & Programmers</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+								{#each PIONEERS.unsungHeroes.filter(h => h.category === 'engineers') as person}
+									<div class="bg-white/[0.02] border border-rose-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.organization}</span>
+										</div>
+										<p class="text-[10px] text-rose-400/70">{person.role} • {person.era}</p>
+										<p class="text-xs text-rose-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Mission Control -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-rose-400/70 uppercase mb-3 border-b border-rose-500/20 pb-2">Mission Control Heroes</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.unsungHeroes.filter(h => h.category === 'mission-control') as person}
+									<div class="bg-white/[0.02] border border-rose-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.organization}</span>
+										</div>
+										<p class="text-[10px] text-rose-400/70">{person.role} • {person.era}</p>
+										<p class="text-xs text-rose-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Support & Mercury 13 -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-rose-400/70 uppercase mb-3 border-b border-rose-500/20 pb-2">Support Staff & Mercury 13</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.unsungHeroes.filter(h => h.category === 'support') as person}
+									<div class="bg-white/[0.02] border border-rose-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.organization}</span>
+										</div>
+										<p class="text-[10px] text-rose-400/70">{person.role} • {person.era}</p>
+										<p class="text-xs text-rose-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- International Contributors -->
+						<div>
+							<h4 class="text-xs tracking-[0.2em] text-rose-400/70 uppercase mb-3 border-b border-rose-500/20 pb-2">International Contributors</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.unsungHeroes.filter(h => h.category === 'international') as person}
+									<div class="bg-white/[0.02] border border-rose-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{person.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{person.organization}</span>
+										</div>
+										<p class="text-[10px] text-rose-400/70">{person.role} • {person.era}</p>
+										<p class="text-xs text-rose-400">{person.achievement}</p>
+										<p class="text-[10px] text-white/40 italic">{person.contribution}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+					</div>
+
+					<!-- Animal Pioneers -->
+					<div class="bg-white/[0.02] border border-orange-500/30 p-6">
+						<div class="flex items-center gap-3 mb-4">
+							<svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+							</svg>
+							<h3 class="text-lg font-medium tracking-wider text-orange-400 uppercase">Animal Pioneers</h3>
+						</div>
+						<p class="text-xs text-white/40 mb-4">In honor of the brave creatures who paved the way for human spaceflight</p>
+
+						<!-- Suborbital -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-orange-400/70 uppercase mb-3 border-b border-orange-500/20 pb-2">Suborbital Flights</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.animals.filter(a => a.category === 'suborbital') as animal}
+									<div class="bg-white/[0.02] border border-orange-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{animal.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{animal.country}</span>
+										</div>
+										<p class="text-[10px] text-orange-400/70">{animal.species} • {animal.year}</p>
+										<p class="text-xs text-white/50">{animal.mission}</p>
+										<p class="text-xs text-orange-400">{animal.achievement}</p>
+										<p class="text-[10px] text-white/30 italic">{animal.fate}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Orbital -->
+						<div class="mb-6">
+							<h4 class="text-xs tracking-[0.2em] text-orange-400/70 uppercase mb-3 border-b border-orange-500/20 pb-2">Orbital Flights</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.animals.filter(a => a.category === 'orbital') as animal}
+									<div class="bg-white/[0.02] border border-orange-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{animal.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{animal.country}</span>
+										</div>
+										<p class="text-[10px] text-orange-400/70">{animal.species} • {animal.year}</p>
+										<p class="text-xs text-white/50">{animal.mission}</p>
+										<p class="text-xs text-orange-400">{animal.achievement}</p>
+										<p class="text-[10px] text-white/30 italic">{animal.fate}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Deep Space & Modern -->
+						<div>
+							<h4 class="text-xs tracking-[0.2em] text-orange-400/70 uppercase mb-3 border-b border-orange-500/20 pb-2">Deep Space & Modern Era</h4>
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+								{#each PIONEERS.animals.filter(a => a.category === 'deep' || a.category === 'modern') as animal}
+									<div class="bg-white/[0.02] border border-orange-500/20 p-3 space-y-1">
+										<div class="flex items-start justify-between">
+											<h5 class="text-sm font-medium text-white/90">{animal.name}</h5>
+											<span class="text-[10px] text-white/30 uppercase">{animal.country}</span>
+										</div>
+										<p class="text-[10px] text-orange-400/70">{animal.species} • {animal.year}</p>
+										<p class="text-xs text-white/50">{animal.mission}</p>
+										<p class="text-xs text-orange-400">{animal.achievement}</p>
+										<p class="text-[10px] text-white/30 italic">{animal.fate}</p>
+									</div>
+								{/each}
+							</div>
+						</div>
+					</div>
+
+					<!-- Link to Complete Astronaut Lists -->
+					<div class="bg-white/[0.02] border border-white/10 p-6 text-center">
+						<h3 class="text-sm font-medium tracking-wider text-white/70 uppercase mb-4">Complete Astronaut Records</h3>
+						<p class="text-xs text-white/40 mb-4">For comprehensive lists of all astronauts, cosmonauts, and taikonauts:</p>
+						<div class="flex flex-wrap justify-center gap-3">
+							<a href="https://www.nasa.gov/humans-in-space/astronauts/" target="_blank" rel="noopener noreferrer" class="px-4 py-2 border border-amber-500/30 text-amber-400/70 hover:text-amber-400 hover:border-amber-500/50 text-xs tracking-wider uppercase transition-colors">NASA Astronaut Corps</a>
+							<a href="https://www.spacefacts.de/english/e_astronauts.htm" target="_blank" rel="noopener noreferrer" class="px-4 py-2 border border-cyan-500/30 text-cyan-400/70 hover:text-cyan-400 hover:border-cyan-500/50 text-xs tracking-wider uppercase transition-colors">Spacefacts Database</a>
+							<a href="https://www.worldspaceflight.com/bios/astronauts.php" target="_blank" rel="noopener noreferrer" class="px-4 py-2 border border-violet-500/30 text-violet-400/70 hover:text-violet-400 hover:border-violet-500/50 text-xs tracking-wider uppercase transition-colors">World Spaceflight</a>
+							<a href="https://en.wikipedia.org/wiki/List_of_space_travelers_by_name" target="_blank" rel="noopener noreferrer" class="px-4 py-2 border border-emerald-500/30 text-emerald-400/70 hover:text-emerald-400 hover:border-emerald-500/50 text-xs tracking-wider uppercase transition-colors">Wikipedia List</a>
 						</div>
 					</div>
 				</div>
@@ -3909,3 +5777,361 @@
 		</div>
 	</footer>
 </div>
+
+<!-- Solar Object Detail Modal (outside main container for proper layering) -->
+{#if selectedSolarObject}
+	<div
+		class="fixed inset-0 bg-black z-50 flex items-center justify-center p-4"
+		onclick={(e) => { if (e.target === e.currentTarget) closeSolarObject(); }}
+		onkeydown={(e) => { if (e.key === 'Escape') closeSolarObject(); }}
+		role="dialog"
+		aria-modal="true"
+		tabindex="-1"
+	>
+		<div class="flex flex-col xl:flex-row gap-4 max-w-7xl w-full max-h-[90vh]" onclick={(e) => e.stopPropagation()} role="presentation">
+			<!-- FIRST PANE: Science Data (Orange) -->
+			<div class="flex-1 bg-zinc-950 border border-orange-500/30 overflow-y-auto">
+				<div class="border-b border-orange-500/20 p-4 bg-zinc-950 sticky top-0 z-10">
+					<div class="flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div class="w-10 h-10 rounded-full {selectedSolarObject.color} flex items-center justify-center">
+								{#if selectedSolarObject.type === 'star'}
+									<svg class="w-5 h-5 text-yellow-900" fill="currentColor" viewBox="0 0 24 24">
+										<circle cx="12" cy="12" r="5"/>
+									</svg>
+								{:else}
+									<span class="text-sm font-bold text-white/70">{selectedSolarObject.name.charAt(0)}</span>
+								{/if}
+							</div>
+							<div>
+								<h3 class="text-xl font-light tracking-wider text-orange-400 uppercase">{selectedSolarObject.name}</h3>
+								<p class="text-xs tracking-wider text-white/50">{selectedSolarObject.subtype || selectedSolarObject.type}</p>
+							</div>
+						</div>
+						<button onclick={closeSolarObject} class="text-white/50 hover:text-white p-2" aria-label="Close details">
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+							</svg>
+						</button>
+					</div>
+				</div>
+
+				<div class="p-4 space-y-4">
+					<!-- Physical Characteristics -->
+					<div class="space-y-2">
+						<h4 class="text-xs tracking-[0.2em] text-orange-400/70 uppercase">Physical Characteristics</h4>
+						<div class="grid grid-cols-2 gap-2 text-xs">
+							<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+								<span class="text-white/40">Diameter:</span>
+								<span class="text-white/80 ml-1">{selectedSolarObject.diameter}</span>
+							</div>
+							<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+								<span class="text-white/40">Mass:</span>
+								<span class="text-white/80 ml-1">{selectedSolarObject.mass}</span>
+							</div>
+							{#if selectedSolarObject.gravity}
+								<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+									<span class="text-white/40">Gravity:</span>
+									<span class="text-white/80 ml-1">{selectedSolarObject.gravity}</span>
+								</div>
+							{/if}
+							{#if selectedSolarObject.density}
+								<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+									<span class="text-white/40">Density:</span>
+									<span class="text-white/80 ml-1">{selectedSolarObject.density}</span>
+								</div>
+							{/if}
+							{#if selectedSolarObject.rotationPeriod}
+								<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+									<span class="text-white/40">Rotation:</span>
+									<span class="text-white/80 ml-1">{selectedSolarObject.rotationPeriod}</span>
+								</div>
+							{/if}
+							{#if selectedSolarObject.axialTilt}
+								<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+									<span class="text-white/40">Axial Tilt:</span>
+									<span class="text-white/80 ml-1">{selectedSolarObject.axialTilt}</span>
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Orbital Characteristics -->
+					<div class="space-y-2">
+						<h4 class="text-xs tracking-[0.2em] text-orange-400/70 uppercase">Orbital Data</h4>
+						<div class="grid grid-cols-2 gap-2 text-xs">
+							<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+								<span class="text-white/40">Distance:</span>
+								<span class="text-white/80 ml-1">{selectedSolarObject.distanceFromSun}</span>
+							</div>
+							<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+								<span class="text-white/40">Orbital Period:</span>
+								<span class="text-white/80 ml-1">{selectedSolarObject.orbitalPeriod}</span>
+							</div>
+							{#if selectedSolarObject.orbitalVelocity}
+								<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+									<span class="text-white/40">Velocity:</span>
+									<span class="text-white/80 ml-1">{selectedSolarObject.orbitalVelocity}</span>
+								</div>
+							{/if}
+							{#if selectedSolarObject.eccentricity}
+								<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+									<span class="text-white/40">Eccentricity:</span>
+									<span class="text-white/80 ml-1">{selectedSolarObject.eccentricity}</span>
+								</div>
+							{/if}
+							{#if selectedSolarObject.inclination}
+								<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+									<span class="text-white/40">Inclination:</span>
+									<span class="text-white/80 ml-1">{selectedSolarObject.inclination}</span>
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Atmosphere/Composition -->
+					{#if selectedSolarObject.atmosphere || selectedSolarObject.composition || selectedSolarObject.surfaceTemp}
+						<div class="space-y-2">
+							<h4 class="text-xs tracking-[0.2em] text-orange-400/70 uppercase">Composition & Environment</h4>
+							<div class="space-y-2 text-xs">
+								{#if selectedSolarObject.surfaceTemp}
+									<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+										<span class="text-white/40">Temperature:</span>
+										<span class="text-white/80 ml-1">{selectedSolarObject.surfaceTemp}</span>
+									</div>
+								{/if}
+								{#if selectedSolarObject.atmosphere}
+									<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+										<span class="text-white/40">Atmosphere:</span>
+										<span class="text-white/80 ml-1">{selectedSolarObject.atmosphere}</span>
+									</div>
+								{/if}
+								{#if selectedSolarObject.composition}
+									<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+										<span class="text-white/40">Composition:</span>
+										<span class="text-white/80 ml-1">{selectedSolarObject.composition}</span>
+									</div>
+								{/if}
+								{#if selectedSolarObject.magneticField}
+									<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+										<span class="text-white/40">Magnetic Field:</span>
+										<span class="text-white/80 ml-1">{selectedSolarObject.magneticField}</span>
+									</div>
+								{/if}
+								{#if selectedSolarObject.rings}
+									<div class="bg-white/[0.02] p-2 border-l-2 border-orange-500/30">
+										<span class="text-white/40">Rings:</span>
+										<span class="text-white/80 ml-1">{selectedSolarObject.rings}</span>
+									</div>
+								{/if}
+							</div>
+						</div>
+					{/if}
+
+					<!-- Notable Features -->
+					{#if selectedSolarObject.notableFeatures && selectedSolarObject.notableFeatures.length > 0}
+						<div class="space-y-2">
+							<h4 class="text-xs tracking-[0.2em] text-orange-400/70 uppercase">Notable Features</h4>
+							<ul class="space-y-1 text-xs">
+								{#each selectedSolarObject.notableFeatures as feature}
+									<li class="flex items-start gap-2 text-white/70">
+										<span class="text-orange-400 mt-0.5">•</span>
+										{feature}
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
+
+					<!-- NASA Fact Sheet Link -->
+					{#if selectedSolarObject.nasaFactSheet}
+						<a
+							href={selectedSolarObject.nasaFactSheet}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="block text-center py-2 border border-orange-500/30 text-orange-400/70 hover:text-orange-400 hover:border-orange-500/50 text-xs tracking-wider uppercase transition-colors"
+						>
+							NASA Fact Sheet →
+						</a>
+					{/if}
+				</div>
+			</div>
+
+			<!-- SECOND PANE: Humanities/Culture (Amber) -->
+			<div class="flex-1 bg-zinc-950 border border-amber-500/30 overflow-y-auto">
+				<div class="border-b border-amber-500/20 p-4 bg-zinc-950 sticky top-0 z-10">
+					<div class="flex items-center gap-2">
+						<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-width="1.5" d="M12 6.5V19M12 6.5C10.5 5 8 4 5 4v13c3 0 5.5 1 7 2.5M12 6.5C13.5 5 16 4 19 4v13c-3 0-5.5 1-7 2.5"/>
+						</svg>
+						<span class="text-sm tracking-[0.2em] text-amber-400 uppercase">Mythology & Culture</span>
+					</div>
+				</div>
+
+				<div class="p-4 space-y-4">
+					<!-- Etymology -->
+					<div class="space-y-2">
+						<h4 class="text-xs tracking-[0.2em] text-amber-400/70 uppercase">Etymology</h4>
+						<p class="text-sm text-white/70 leading-relaxed">{selectedSolarObject.etymology}</p>
+					</div>
+
+					<!-- Mythology Origin -->
+					{#if selectedSolarObject.mythologyOrigin}
+						<div class="space-y-2">
+							<h4 class="text-xs tracking-[0.2em] text-amber-400/70 uppercase">Mythological Origin</h4>
+							<p class="text-sm text-white/70 leading-relaxed">{selectedSolarObject.mythologyOrigin}</p>
+						</div>
+					{/if}
+
+					<!-- Cultural Significance -->
+					{#if selectedSolarObject.culturalSignificance}
+						<div class="space-y-2">
+							<h4 class="text-xs tracking-[0.2em] text-amber-400/70 uppercase">Cultural Significance</h4>
+							<p class="text-sm text-white/70 leading-relaxed">{selectedSolarObject.culturalSignificance}</p>
+						</div>
+					{/if}
+
+					<!-- Historical Observations -->
+					{#if selectedSolarObject.historicalObservations}
+						<div class="space-y-2">
+							<h4 class="text-xs tracking-[0.2em] text-amber-400/70 uppercase">Historical Observations</h4>
+							<p class="text-sm text-white/70 leading-relaxed">{selectedSolarObject.historicalObservations}</p>
+						</div>
+					{/if}
+
+					<!-- Symbolism -->
+					{#if selectedSolarObject.symbolism}
+						<div class="space-y-2">
+							<h4 class="text-xs tracking-[0.2em] text-amber-400/70 uppercase">Symbolism</h4>
+							<p class="text-sm text-white/70 leading-relaxed">{selectedSolarObject.symbolism}</p>
+						</div>
+					{/if}
+
+					<!-- Missions Timeline -->
+					{#if selectedSolarObject.missions && selectedSolarObject.missions.length > 0}
+						<div class="space-y-2">
+							<h4 class="text-xs tracking-[0.2em] text-amber-400/70 uppercase">Exploration History</h4>
+							<div class="space-y-2">
+								{#each selectedSolarObject.missions as mission}
+									<div class="bg-white/[0.02] p-3 border-l-2 border-amber-500/30">
+										<div class="flex items-center justify-between mb-1">
+											<span class="text-sm text-white/90 font-medium">{mission.name}</span>
+											<span class="text-xs text-amber-400/70">{mission.year}</span>
+										</div>
+										<div class="flex items-center gap-2 text-[10px] text-white/40">
+											<span>{mission.agency}</span>
+											<span>•</span>
+											<span>{mission.type}</span>
+										</div>
+										{#if mission.notable}
+											<p class="text-xs text-white/60 mt-1">{mission.notable}</p>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
+			</div>
+
+			<!-- THIRD PANE: Moons (Cyan) -->
+			<div class="flex-1 bg-zinc-950 border border-cyan-500/30 overflow-y-auto xl:max-w-sm">
+				<div class="border-b border-cyan-500/20 p-4 bg-zinc-950 sticky top-0 z-10">
+					<div class="flex items-center gap-2">
+						<svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<circle cx="12" cy="12" r="9" stroke-width="1.5"/>
+							<circle cx="12" cy="12" r="3" stroke-width="1.5"/>
+						</svg>
+						<span class="text-sm tracking-[0.2em] text-cyan-400 uppercase">
+							{selectedSolarObject.moons && selectedSolarObject.moons.length > 0 ? 'Moons' : 'Quick Reference'}
+						</span>
+					</div>
+				</div>
+
+				<div class="p-4 space-y-4">
+					{#if selectedSolarObject.moons && selectedSolarObject.moons.length > 0}
+						<!-- Moon Count Badge -->
+						{#if selectedSolarObject.moonCount && selectedSolarObject.moonCount > selectedSolarObject.moons.length}
+							<div class="text-center py-2 bg-cyan-500/10 border border-cyan-500/20">
+								<span class="text-sm text-cyan-400">{selectedSolarObject.moonCount} known moons</span>
+								<span class="text-xs text-white/40 block">Showing {selectedSolarObject.moons.length} major moons</span>
+							</div>
+						{/if}
+
+						<!-- Moon Cards -->
+						<div class="space-y-3">
+							{#each selectedSolarObject.moons as moon}
+								<div class="bg-white/[0.02] border border-cyan-500/20 p-3">
+									<div class="flex items-center justify-between mb-2">
+										<h5 class="text-sm font-medium text-white/90">{moon.name}</h5>
+										<span class="text-[10px] text-cyan-400/70">{moon.diameter}</span>
+									</div>
+									<p class="text-xs text-white/60 mb-2">{moon.description}</p>
+									{#if moon.notable}
+										<p class="text-xs text-cyan-400/70 italic">{moon.notable}</p>
+									{/if}
+									<div class="flex items-center gap-4 mt-2 pt-2 border-t border-white/5 text-[10px] text-white/40">
+										<span>Orbit: {moon.orbitalPeriod}</span>
+										{#if moon.discoveryYear}
+											<span>Discovered: {moon.discoveryYear}</span>
+										{/if}
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<!-- No Moons - Show Quick Reference Instead -->
+						<div class="text-center py-4 text-white/40">
+							{#if selectedSolarObject.type === 'planet' && selectedSolarObject.moonCount === 0}
+								<svg class="w-12 h-12 mx-auto mb-2 text-cyan-500/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<circle cx="12" cy="12" r="9" stroke-width="1" stroke-dasharray="4 2"/>
+									<path stroke-width="1" d="M8 12a4 4 0 018 0" opacity="0.5"/>
+								</svg>
+								<p class="text-sm">No natural satellites</p>
+								<p class="text-xs text-white/30 mt-1">{selectedSolarObject.name} has no moons</p>
+							{:else}
+								<svg class="w-12 h-12 mx-auto mb-2 text-cyan-500/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<circle cx="12" cy="12" r="9" stroke-width="1"/>
+									<path stroke-width="1" d="M12 3v18M3 12h18" opacity="0.3"/>
+								</svg>
+								<p class="text-sm">Quick Reference</p>
+							{/if}
+						</div>
+
+						<!-- Quick Stats Grid -->
+						<div class="space-y-2">
+							<div class="grid grid-cols-2 gap-2 text-xs">
+								<div class="bg-cyan-500/5 p-2 text-center">
+									<span class="block text-cyan-400/70 text-[10px] uppercase">Type</span>
+									<span class="text-white/80">{selectedSolarObject.type}</span>
+								</div>
+								{#if selectedSolarObject.subtype}
+									<div class="bg-cyan-500/5 p-2 text-center">
+										<span class="block text-cyan-400/70 text-[10px] uppercase">Class</span>
+										<span class="text-white/80 text-[11px]">{selectedSolarObject.subtype.split(' ')[0]}</span>
+									</div>
+								{/if}
+							</div>
+
+							{#if selectedSolarObject.moonCount !== undefined}
+								<div class="bg-cyan-500/5 p-2 text-center text-xs">
+									<span class="text-cyan-400/70 text-[10px] uppercase">Moon Count: </span>
+									<span class="text-white/80">{selectedSolarObject.moonCount}</span>
+								</div>
+							{/if}
+						</div>
+
+						<!-- Decorative Element -->
+						<div class="relative h-32 overflow-hidden opacity-30">
+							<div class="absolute inset-0 flex items-center justify-center">
+								<div class="w-20 h-20 rounded-full {selectedSolarObject.color} opacity-50"></div>
+								<div class="absolute w-32 h-32 border border-cyan-500/30 rounded-full animate-pulse"></div>
+								<div class="absolute w-40 h-40 border border-cyan-500/20 rounded-full" style="animation: pulse 3s infinite;"></div>
+							</div>
+						</div>
+					{/if}
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
