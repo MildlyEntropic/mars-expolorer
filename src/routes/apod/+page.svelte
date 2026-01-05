@@ -136,7 +136,7 @@
 	<footer class="relative z-10 border-t border-white/5 mt-12">
 		<div class="max-w-7xl mx-auto px-8 py-6">
 			<p class="text-xs tracking-wider text-white/50 text-center">
-				Data: <a href="https://apod.nasa.gov" target="_blank" rel="noopener noreferrer" class="text-apod/70 hover:text-apod transition-colors">NASA APOD</a>
+				Data source: <a href="https://apod.nasa.gov" target="_blank" rel="noopener noreferrer" class="text-apod/70 hover:text-apod transition-colors">NASA APOD</a>
 			</p>
 		</div>
 	</footer>
