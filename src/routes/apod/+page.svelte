@@ -3,10 +3,6 @@
 	import type { SpaceImage } from '$lib/types/mars';
 	import Lightbox from '$lib/components/Lightbox.svelte';
 
-	// Use public API key (rate limited but works)
-	const NASA_API_KEY = 'DEMO_KEY';
-	const APOD_API = 'https://api.nasa.gov/planetary/apod';
-
 	let todayApod: SpaceImage | null = $state(null);
 	let recentApod: SpaceImage[] = $state([]);
 	let selectedImage: SpaceImage | null = $state(null);
@@ -62,7 +58,7 @@
 
 	async function fetchToday(): Promise<SpaceImage | null> {
 		try {
-			const response = await fetch(`${APOD_API}?api_key=${NASA_API_KEY}`);
+			const response = await fetch('/api/apod');
 			if (!response.ok) return null;
 			const data: APODResponse = await response.json();
 			if (data.media_type === 'video') return null;
@@ -74,9 +70,7 @@
 
 	async function fetchDateRange(startStr: string, endStr: string): Promise<SpaceImage[]> {
 		try {
-			const response = await fetch(
-				`${APOD_API}?api_key=${NASA_API_KEY}&start_date=${startStr}&end_date=${endStr}`
-			);
+			const response = await fetch(`/api/apod?start_date=${startStr}&end_date=${endStr}`);
 			if (!response.ok) return [];
 			const data: APODResponse[] = await response.json();
 			return data
