@@ -1,5 +1,10 @@
 {
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"framework": "sveltekit",
-	"regions": ["iad1"]
+	"regions": ["iad1"],
+	"functions": {
+		"**/*.func": {
+			"maxDuration": 60
+		}
+	}
 }

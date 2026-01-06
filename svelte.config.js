@@ -7,8 +7,9 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-			// Serverless functions for API routes
-			runtime: 'nodejs20.x'
+			runtime: 'nodejs20.x',
+			// Increase timeout for slow NASA API
+			maxDuration: 60
 		})
 	}
 };
