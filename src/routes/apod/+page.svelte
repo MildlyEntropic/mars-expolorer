@@ -249,6 +249,7 @@
 			<section class="py-24 text-center space-y-4">
 				<div class="inline-block w-8 h-8 border-2 border-apod/30 border-t-apod rounded-full animate-spin"></div>
 				<p class="text-white/40 text-sm tracking-wider">Loading images from NASA...</p>
+				<p class="text-white/30 text-xs tracking-wider">NASA's servers can be slow. Please wait...</p>
 			</section>
 		{:else if error && recentApod.length === 0}
 			<section class="py-24 text-center space-y-4">
